@@ -1,0 +1,8 @@
+subprojects { proj ->
+    repositories {
+        maven { url 'http://maven.app800.cn/repository/public/' }
+        mavenCentral()
+        google()
+    }
+
+}
