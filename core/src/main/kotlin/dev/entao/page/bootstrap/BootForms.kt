@@ -13,7 +13,7 @@ import kotlin.reflect.full.findAnnotation
 private val InputTags = setOf("input", "select", "textarea")
 
 fun Tag.formQuery(formAction: KFunction<*>, vararg kv: KeyValuePair, block: TagCallback): Tag {
-	return form("method" to V.GET, DATA_FORM_QUERY_ to "1", *kv) {
+	return form("method" to "GET", DATA_FORM_QUERY_ to "1", *kv) {
 		this += formAction
 		this.block()
 		submitPrimary("查询")
@@ -193,7 +193,7 @@ private fun Tag.processPropertiesOfEdit(p: Prop) {
 	if (p.isTypeInt || p.isTypeLong || p.isTypeFloat || p.isTypeDouble) {
 		this += "type" to "number"
 	} else if (p.isTypeClass(java.sql.Date::class)) {
-		this += "type" to V.date
+		this += "type" to "date"
 	}
 	val stepAn = p.findAnnotation<StepValue>()
 	if (stepAn == null) {

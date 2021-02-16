@@ -21,28 +21,28 @@ fun Tag.form(formAction: ActionURL, vararg kv: KeyValuePair, block: TagCallback)
 }
 
 fun Tag.formGET(formAction: KFunction<*>, vararg kv: KeyValuePair, block: TagCallback): Tag {
-	return form("method" to V.GET, *kv) {
+	return form("method" to "GET", *kv) {
 		this += formAction
 		this.block()
 	}
 }
 
 fun Tag.formGET(formAction: ActionURL, vararg kv: KeyValuePair, block: TagCallback): Tag {
-	return form("method" to V.GET, *kv) {
+	return form("method" to "GET", *kv) {
 		this += formAction
 		this.block()
 	}
 }
 
 fun Tag.formPOST(formAction: KFunction<*>, vararg kv: KeyValuePair, block: TagCallback): Tag {
-	return form("method" to V.POST, *kv) {
+	return form("method" to "POST", *kv) {
 		this += formAction
 		this.block()
 	}
 }
 
 fun Tag.formPOST(formAction: ActionURL, vararg kv: KeyValuePair, block: TagCallback): Tag {
-	return form("method" to V.POST, *kv) {
+	return form("method" to "POST", *kv) {
 		this += formAction
 		this.block()
 	}

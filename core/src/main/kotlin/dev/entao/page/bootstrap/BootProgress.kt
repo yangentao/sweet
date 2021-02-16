@@ -10,7 +10,7 @@ fun Tag.progress(vararg kv: KeyValuePair, block: Tag.() -> Unit): Tag {
 }
 
 fun Tag.progressBar(block: Tag.() -> Unit): Tag {
-	return this.div("class" to "progress-bar", "role" to V.progressbar) {
+	return this.div("class" to "progress-bar", "role" to "progressbar") {
 		this["aria-valuemin"] = "0"
 		this["aria-valuemax"] = "100"
 		this.block()

@@ -52,7 +52,7 @@ class ModalDialog(context: HttpContext) : Tag(context, "div") {
 		this += "modal"
 		this["tabindex"] = "-1"
 		this["role"] = "dialog"
-		div("class" to "modal-dialog".."modal-dialog-centered", "role" to V.document) {
+		div("class" to "modal-dialog".."modal-dialog-centered", "role" to "document") {
 			div("class" to "modal-content") {
 				modalHeader = div("class" to "modal-header") {
 					modalHeaderTitle = h5("class" to "modal-title") {
