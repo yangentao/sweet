@@ -14,22 +14,22 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 	val HP: Int = 6
 
 	nav {
-		ul(class_ to _pagination.._pagination_sm) {
+		ul("class" to "pagination".."pagination-sm") {
 
 			if (pageCount < 10) {
 				for (i in 0 until pageCount) {
-					li(class_ to _page_item) {
+					li("class" to "page-item") {
 						if (i == currentPage) {
-							this += _active
+							this += "active"
 						}
-						a(class_ to _page_link, href_ to "#", P.dataPage to "$i") {
+						a("class" to "page-link", "href" to "#", P.dataPage to "$i") {
 							+"${i + 1}"
 						}
 					}
 				}
 			} else {
-				li(class_ to _page_item) {
-					a(class_ to _page_link, href_ to "#", P.dataPage to "0") {
+				li("class" to "page-item") {
+					a("class" to "page-link", "href" to "#", P.dataPage to "0") {
 						+S.firstPage
 					}
 				}
@@ -55,33 +55,33 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 					}
 				}
 				if (fromP != 0) {
-					li(class_ to _page_item) {
-						a(class_ to _page_link, href_ to "#", P.dataPage to "${fromP - 1}") {
+					li("class" to "page-item") {
+						a("class" to "page-link", "href" to "#", P.dataPage to "${fromP - 1}") {
 							+"..."
 						}
 					}
 				}
 
 				for (i in fromP..toP) {
-					li(class_ to _page_item) {
+					li("class" to "page-item") {
 						if (i == currentPage) {
-							this += _active
+							this += "active"
 						}
-						a(class_ to _page_link, href_ to "#", P.dataPage to "$i") {
+						a("class" to "page-link", "href" to "#", P.dataPage to "$i") {
 							+"${i + 1}"
 						}
 					}
 				}
 				if (toP != maxP) {
-					li(class_ to _page_item) {
-						a(class_ to _page_link, href_ to "#", P.dataPage to "${toP + 1}") {
+					li("class" to "page-item") {
+						a("class" to "page-link", "href" to "#", P.dataPage to "${toP + 1}") {
 							+"..."
 						}
 					}
 				}
 
-				li(class_ to _page_item) {
-					a(class_ to _page_link, href_ to "#", P.dataPage to "$maxP") {
+				li("class" to "page-item") {
+					a("class" to "page-link", "href" to "#", P.dataPage to "$maxP") {
 						+S.lastPage
 					}
 				}

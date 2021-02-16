@@ -7,14 +7,14 @@ import dev.entao.page.tag.*
 //	<button type="button" class="btn btn-secondary">Middle</button>
 //	<button type="button" class="btn btn-secondary">Right</button>
 //</div>
-fun Tag.buttonGroup(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(role_ to "group", class_ to _btn_group, *kv, block = block)
+fun Tag.buttonGroup(vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return this.div("role" to "group", "class" to "btn-group", *kv, block = block)
 }
 
-fun Tag.buttonGroup(theme: HClass, vararg kv: HKeyValue, block: TagCallback): Tag {
-	val g = this.div(role_ to "group", class_ to _btn_group, *kv, block = block)
-	g[tagname_ to "button"].forEach {
-		it[class_] = _btn..theme
+fun Tag.buttonGroup(theme: String, vararg kv: KeyValuePair, block: TagCallback): Tag {
+	val g = this.div("role" to "group", "class" to "btn-group", *kv, block = block)
+	g[TAGNAME_ to "button"].forEach {
+		it["class"] = "btn"..theme
 	}
 	return g
 }
@@ -35,8 +35,8 @@ fun Tag.buttonGroup(theme: HClass, vararg kv: HKeyValue, block: TagCallback): Ta
 //		<button type="button" class="btn btn-secondary">8</button>
 //	</div>
 //</div>
-fun Tag.buttonToolbar(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.div(role_ to "toolbar", class_ to _btn_toolbar, *kv, block = block)
+fun Tag.buttonToolbar(vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return this.div("role" to "toolbar", "class" to "btn-toolbar", *kv, block = block)
 }
 
 //<div class="btn-group" role="group">
@@ -50,12 +50,12 @@ fun Tag.buttonToolbar(vararg kv: HKeyValue, block: TagCallback): Tag {
 //</div>
 fun Tag.buttonGroupDropdown(btnText: String, size: Int, block: (Tag, Int) -> Unit): Tag {
 	return this.buttonGroup() {
-		button(class_ to _btn_secondary.._dropdown_toggle) {
+		button("class" to "btn-secondary".."dropdown-toggle") {
 			+btnText
 		}
-		div(class_ to _dropdown_menu) {
+		div("class" to "dropdown-menu") {
 			for (i in 0 until size) {
-				a(class_ to _dropdown_item, href_ to "#") {
+				a("class" to "dropdown-item", "href" to "#") {
 					block(this, i)
 				}
 			}

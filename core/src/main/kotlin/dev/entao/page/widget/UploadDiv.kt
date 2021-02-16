@@ -39,18 +39,18 @@ fun Tag.uploadDiv(p: KProperty<*>) {
 }
 
 fun Tag.uploadDiv(hiddenName: String, hiddenValue: String) {
-	this.div(class_ to "form-control drag-upload-div", style_ to "height: 8em;") {
+	this.div("class" to "form-control drag-upload-div", "style" to "height: 8em;") {
 		hidden(hiddenName, hiddenValue)
-		img(style_ to "height:5em;margin:4px;") {
+		img("style" to "height:5em;margin:4px;") {
 		}
-		progress(style_ to "height:0.2em") {
+		progress("style" to "height:0.2em") {
 			progressBar {
 			}
 		}
-		span(style_ to "font-size:50%") {
+		span("style" to "font-size:50%") {
 			+"将文件拖拽到此区域"
 		}
-		span(style_ to "font-size:50%") {
+		span("style" to "font-size:50%") {
 		}
 		val myDivId = needId()
 		script {

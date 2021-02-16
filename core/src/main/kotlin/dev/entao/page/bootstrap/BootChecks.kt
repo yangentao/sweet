@@ -24,17 +24,17 @@ fun Tag.formGroupRadioStatic(p: Prop, defaultValue: String? = null, inlines: Boo
 		ls.forEach { opt ->
 			formCheck {
 				if (inlines) {
-					this += _form_check_inline
+					this += "form-check-inline"
 				}
-				val r = radio(name_ to pname, value_ to opt.key) {
+				val r = radio("name" to pname, "value" to opt.key) {
 					if (selVal == null) { //选中第一个
-						this += checked_ to "checked"
-						selVal = this[value_]
+						this += "checked" to "checked"
+						selVal = this["value"]
 					} else if (selVal == opt.key) {
-						this += checked_ to "checked"
+						this += "checked" to "checked"
 					}
 				}
-				label(opt.value)[for_] = r.needId()
+				label(opt.value)["for"] = r.needId()
 			}
 		}
 		this.processHelpText(p)
@@ -51,17 +51,17 @@ fun Tag.formGroupCheckStatic(p: Prop, defaultValue: String? = null, inlines: Boo
 		ls.forEach { opt ->
 			formCheck {
 				if (inlines) {
-					this += _form_check_inline
+					this += "form-check-inline"
 				}
-				val r = checkbox(name_ to pname, value_ to opt.key) {
+				val r = checkbox("name" to pname, "value" to opt.key) {
 					if (selVal == null) { //选中第一个
-						this += checked_ to "checked"
-						selVal = this[value_]
+						this += "checked" to "checked"
+						selVal = this["value"]
 					} else if (selVal == opt.key) {
-						this += checked_ to "checked"
+						this += "checked" to "checked"
 					}
 				}
-				label(opt.value)[for_] = r.needId()
+				label(opt.value)["for"] = r.needId()
 			}
 		}
 		this.processHelpText(p)

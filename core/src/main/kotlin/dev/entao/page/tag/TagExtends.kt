@@ -6,7 +6,7 @@ import dev.entao.base.*
 
 
 fun Tag.a(text: String, href: String): Tag {
-	return this.a(href_ to href) {
+	return this.a("href" to href) {
 		+text
 	}
 }
@@ -31,7 +31,7 @@ fun Tag.hidden(p: Prop0) {
 	val v = p.getValue()?.toString() ?: ""
 	this.hidden {
 		name = p.userName
-		this += value_ to v
+		this += "value" to v
 	}
 }
 
@@ -39,7 +39,7 @@ fun Tag.hidden(hiddenName: String, hiddenValue: Any?) {
 	val v = hiddenValue?.toString() ?: ""
 	this.hidden {
 		name = hiddenName
-		this += value_ to v
+		this += "value" to v
 	}
 }
 
@@ -47,29 +47,29 @@ fun Tag.hidden(p: Prop1, v: Any?) {
 	val vv = v?.toString() ?: ""
 	this.hidden {
 		name = p.userName
-		this += value_ to vv
+		this += "value" to vv
 	}
 }
 
 fun Tag.label(p: Prop): Tag {
-	return this.label(for_ to p.userName) {
+	return this.label("for" to p.userName) {
 		+p.userLabel
 	}
 }
 
 fun Tag.forField(p: Prop) {
-	this += for_ to p.userName
+	this += "for" to p.userName
 }
 
 
 fun Tag.mutedText(block: TagCallback): Tag {
-	return this.small(class_ to _text_muted, block = block)
+	return this.small("class" to "text-muted", block = block)
 }
 
 fun Tag.pArticle(text: String) {
 	val textList = text.split("\n")
 	for (s in textList) {
-		this.p(style_ to "text-indent:2em") {
+		this.p("style" to "text-indent:2em") {
 			textEscaped(s)?.forView = true
 		}
 	}

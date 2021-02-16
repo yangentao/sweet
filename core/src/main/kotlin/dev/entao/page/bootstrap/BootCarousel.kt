@@ -11,43 +11,43 @@ class CarouselItem {
 }
 
 fun Tag.buildCarousel(ident: String, items: List<CarouselItem>): Tag {
-	return div(id_ to ident, class_ to _carousel.."slide", data_ride_ to _carousel) {
-		ol(class_ to _carousel_indicators) {
+	return div("id" to ident, "class" to "carousel".."slide", "data-ride" to "carousel") {
+		ol("class" to "carousel-indicators") {
 			for (i in items.indices) {
-				val t = li(data_target_ to "#$ident", data_slide_to_ to "$i")
+				val t = li("data-target" to "#$ident", "data-slide-to" to "$i")
 				if (i == 0) {
-					t += _active
+					t += "active"
 				}
 			}
 		}
-		div(class_ to _carousel_inner) {
+		div("class" to "carousel-inner") {
 			for (i in items.indices) {
 				val item = items[i]
-				val t = div(class_ to _carousel_item) {
+				val t = div("class" to "carousel-item") {
 					if (item.linkTo.isEmpty()) {
-						img(class_ to _d_block.._w_100, src_ to item.imgSrc)
+						img("class" to "d-block".."w-100", "src" to item.imgSrc)
 					} else {
-						a(href_ to item.linkTo) {
-							img(class_ to _d_block.._w_100, src_ to item.imgSrc)
+						a("href" to item.linkTo) {
+							img("class" to "d-block".."w-100", "src" to item.imgSrc)
 						}
 					}
-					div(class_ to _carousel_caption.._d_none.._d_md_block) {
+					div("class" to "carousel-caption".."d-none".."d-md-block") {
 						h5 { +item.title }
 						p { +item.desc }
 					}
 				}
 				if (i == 0) {
-					t += _active
+					t += "active"
 				}
 			}
 		}
-		a(class_ to _carousel_control_prev, href_ to "#$ident", role_ to "button", data_slide_ to "prev") {
-			span(class_ to _carousel_control_prev_icon, aria_hidden_ to "true")
-			span(class_ to _sr_only) { +"Previous" }
+		a("class" to "carousel-control-prev", "href" to "#$ident", "role" to "button", "data-slide" to "prev") {
+			span("class" to "carousel-control-prev-icon", "aria-hidden" to "true")
+			span("class" to "sr-only") { +"Previous" }
 		}
-		a(class_ to _carousel_control_next, href_ to "#$ident", role_ to "button", data_slide_ to "next") {
-			span(class_ to _carousel_control_next_icon, aria_hidden_ to "true")
-			span(class_ to _sr_only) { +"Previous" }
+		a("class" to "carousel-control-next", "href" to "#$ident", "role" to "button", "data-slide" to "next") {
+			span("class" to "carousel-control-next-icon", "aria-hidden" to "true")
+			span("class" to "sr-only") { +"Previous" }
 		}
 	}
 }

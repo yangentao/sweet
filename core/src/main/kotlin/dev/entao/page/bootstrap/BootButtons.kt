@@ -38,30 +38,30 @@ fun Tag.a(action: ActionURL, text: String): Tag {
 }
 
 
-fun Tag.linkButton(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return a(role_ to "button", class_ to _btn, *kv, block = block)
+fun Tag.linkButton(vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return a("role" to "button", "class" to "btn", *kv, block = block)
 }
 
 
 fun Tag.submit(text: String = "提交"): Tag {
-	return this.submit(class_ to _btn) { +text }
+	return this.submit("class" to "btn") { +text }
 }
 
 fun Tag.submitPrimary(text: String = "提交"): Tag {
-	return this.submit(class_ to _btn.._btn_primary) { +text }
+	return this.submit("class" to "btn".."btn-primary") { +text }
 }
 
 
-fun Tag.buttonB(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.button(class_ to _btn, *kv, block = block)
+fun Tag.buttonB(vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return this.button("class" to "btn", *kv, block = block)
 }
 
-fun Tag.buttonTheme(theme: HClass, vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.button(class_ to _btn..theme, *kv, block = block)
+fun Tag.buttonTheme(theme: String, vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return this.button("class" to "btn"..theme, *kv, block = block)
 }
 
-fun Tag.buttonPrimary(vararg kv: HKeyValue, block: TagCallback): Tag {
-	return this.buttonTheme(_btn_primary, *kv, block = block)
+fun Tag.buttonPrimary(vararg kv: KeyValuePair, block: TagCallback): Tag {
+	return this.buttonTheme("btn-primary", *kv, block = block)
 }
 
 
@@ -73,11 +73,11 @@ fun Tag.buttonApplyTheme(action: HttpAction, defaultTheme: String): Tag {
 		}
 	} else {
 		if (action.findAnnotation<ActionDanger>() != null) {
-			this += _btn_danger
+			this += "btn-danger"
 		} else if (action.findAnnotation<ActionSafe>() != null) {
-			this += _btn_success
+			this += "btn-success"
 		} else if (action.findAnnotation<ActionPrimary>() != null) {
-			this += _btn_primary
+			this += "btn-primary"
 		} else {
 			if (defaultTheme.isNotEmpty()) {
 				this += defaultTheme
@@ -87,33 +87,33 @@ fun Tag.buttonApplyTheme(action: HttpAction, defaultTheme: String): Tag {
 	return this
 }
 
-fun Tag.buttonX(action: HttpAction, vararg kv: HKeyValue, block: TagCallback = {}): Tag {
-	val t = button(class_ to _btn, *kv) {
+fun Tag.buttonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
+	val t = button("class" to "btn", *kv) {
 		+action.userLabel
 		this += action
 		needId()
-		this[data_param_name_] = action.firstParamName ?: "id"
-		this[data_confirm_] = action.findAnnotation<FormConfirm>()?.value ?: ""
+		this[DATA_PARAM_NAME_] = action.firstParamName ?: "id"
+		this[DATA_CONFIRM_] = action.findAnnotation<FormConfirm>()?.value ?: ""
 	}
 	t.block()
 	return t
 }
 
-fun Tag.buttonX(actionURL: ActionURL, vararg kv: HKeyValue, block: TagCallback = {}): Tag {
+fun Tag.buttonX(actionURL: ActionURL, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
 	val action = actionURL.action
-	val t = button(class_ to _btn, *kv) {
+	val t = button("class" to "btn", *kv) {
 		+action.userLabel
 		this += actionURL
 		needId()
-		this[data_param_name_] = action.firstParamName ?: "id"
-		this[data_confirm_] = action.findAnnotation<FormConfirm>()?.value ?: ""
+		this[DATA_PARAM_NAME_] = action.firstParamName ?: "id"
+		this[DATA_CONFIRM_] = action.findAnnotation<FormConfirm>()?.value ?: ""
 	}
 	t.block()
 	return t
 }
 
 
-fun Tag.linkButtonX(action: HttpAction, vararg kv: HKeyValue, block: TagCallback = {}): Tag {
+fun Tag.linkButtonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
 	val t = linkButton(*kv) {
 		this += action
 	}
@@ -121,7 +121,7 @@ fun Tag.linkButtonX(action: HttpAction, vararg kv: HKeyValue, block: TagCallback
 	return t
 }
 
-fun Tag.linkButtonX(actionURL: ActionURL, vararg kv: HKeyValue, block: TagCallback = {}): Tag {
+fun Tag.linkButtonX(actionURL: ActionURL, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
 	val t = linkButton(*kv) {
 		this += actionURL
 	}
@@ -151,27 +151,27 @@ fun Tag.submitAsync(respJS: String = ""): Tag {
 
 
 fun Tag.confirm(text: String): Tag {
-	this[data_confirm_] = text
+	this[DATA_CONFIRM_] = text
 	if (this.tagName == "a") {
-		this[onclick_] = "var s = $(this).attr('data-confirm');return !s || confirm(s);"
+		this["onclick"] = "var s = $(this).attr('data-confirm');return !s || confirm(s);"
 	}
 	return this
 }
 
 fun Tag.confirm(action: HttpAction): Tag {
 	val fcValue = action.findAnnotation<FormConfirm>()?.value ?: return this
-	this[data_confirm_] = fcValue
+	this[DATA_CONFIRM_] = fcValue
 	if (this.tagName == "a") {
-		this[onclick_] = "var s = $(this).attr('data-confirm');return !s || confirm(s);"
+		this["onclick"] = "var s = $(this).attr('data-confirm');return !s || confirm(s);"
 	}
 	return this
 }
 
 
 fun Tag.onClickReload() {
-	this[onclick_] = "reloadLink(this); return false ;"
+	this["onclick"] = "reloadLink(this); return false ;"
 }
 
 fun Tag.onClickOpenDialog() {
-	this[onclick_] = "openDialogPanel(this); return false;"
+	this["onclick"] = "openDialogPanel(this); return false;"
 }

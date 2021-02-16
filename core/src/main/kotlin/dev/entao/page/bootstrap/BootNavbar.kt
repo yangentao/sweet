@@ -12,14 +12,14 @@ fun Tag.navItem(action: HttpAction, label: String = "") {
 
 fun Tag.navItem(action: ActionURL, label: String = "") {
 	val acUri = this.httpContext.actionUri(action.action)
-	li(class_ to _nav_item) {
-		a(class_ to _nav_link) {
+	li("class" to "nav-item") {
+		a("class" to "nav-link") {
 			if (label.isNotEmpty()) {
 				+label
 			} else {
 				+action.action.userLabel
 			}
-			this[href_] = action.toURL(httpContext)
+			this["href"] = action.toURL(httpContext)
 		}
 		if (httpContext.currentUri == acUri) {
 			var active = true
@@ -27,7 +27,7 @@ fun Tag.navItem(action: ActionURL, label: String = "") {
 				active = active && (httpContext.params.str(k) == v)
 			}
 			if (active) {
-				this += _active
+				this += "active"
 			}
 		}
 	}
@@ -35,30 +35,30 @@ fun Tag.navItem(action: ActionURL, label: String = "") {
 
 
 fun Tag.navbar(clazz: String, block: TagCallback) {
-	nav(class_ to _navbar.._navbar_expand_lg..clazz, block = block)
+	nav("class" to "navbar".."navbar-expand-lg"..clazz, block = block)
 }
 
-fun Tag.navbarBrand(vararg kv: HKeyValue, block: TagCallback) {
-	a(class_ to _navbar_brand, href_ to "#", *kv, block = block)
+fun Tag.navbarBrand(vararg kv: KeyValuePair, block: TagCallback) {
+	a("class" to "navbar-brand", "href" to "#", *kv, block = block)
 }
 
 fun Tag.navbarToggler(targetId: String) {
-	button(class_ to _navbar_toggler, data_toggle_ to "collapse",
-			data_target_ to "#$targetId",
-			aria_controls_ to targetId,
-			aria_expanded_ to "false") {
-		span(class_ to _navbar_toggler_icon) {}
+	button("class" to "navbar-toggler", "data-toggle" to "collapse",
+		"data-target" to "#$targetId",
+		"aria-controls" to targetId,
+		"aria-expanded" to "false") {
+		span("class" to "navbar-toggler-icon") {}
 	}
 }
 
 fun Tag.navbarCollapse(id: String, count: Int, itemCallback: (Tag, Int) -> Boolean) {
-	div(class_ to _collapse.._navbar_collapse, id_ to id) {
-		ul(class_ to _navbar_nav.._mr_auto) {
+	div("class" to "collapse".."navbar-collapse", "id" to id) {
+		ul("class" to "navbar-nav".."mr-auto") {
 			for (i in 0 until count) {
-				li(class_ to _nav_item) {
-					val aLink = a(class_ to _nav_link, href_ to "#")
+				li("class" to "nav-item") {
+					val aLink = a("class" to "nav-link", "href" to "#")
 					if (itemCallback(aLink, i)) {
-						this += _active
+						this += "active"
 					}
 				}
 			}

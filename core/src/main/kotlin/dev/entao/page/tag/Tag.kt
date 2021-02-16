@@ -9,15 +9,12 @@ import dev.entao.core.HttpContext
 import dev.entao.page.bootstrap.confirm
 import java.util.*
 
-typealias TagCallback = Tag.() -> Unit
-typealias HKeyValue = Pair<String, String>
-
 
 //TODO 将tag的toString单独拿出来.
 open class Tag(val httpContext: HttpContext, var tagName: String) {
 
-	val children = ArrayList<Tag>(32)
-	val attrs: TagMap = TagMap()
+	val children = ArrayList<Tag>(8)
+	val attrs: AttrMap = AttrMap()
 	var parent: Tag? = null
 	var id: String by attrs
 	var name: String by attrs
@@ -37,7 +34,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return p.parent(block)
 	}
 
-	fun parent(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+	fun parent(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
 		val p = this.parent ?: return null
 		if (p.match(attr, *vs)) {
 			return p
@@ -64,13 +61,13 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 	}
 
 
-	fun list(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+	fun list(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
 		return this.children.filter {
 			it.match(attr, *vs)
 		}
 	}
 
-	fun listDeep(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+	fun listDeep(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
 		val ls = ArrayList<Tag>()
 		for (c in this.children) {
 			if (c.match(attr, *vs)) {
@@ -81,7 +78,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return ls
 	}
 
-	fun first(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+	fun first(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
 		for (c in this.children) {
 			if (c.match(attr, *vs)) {
 				return c
@@ -90,7 +87,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return null
 	}
 
-	fun firstDeep(attr: HKeyValue, vararg vs: HKeyValue): Tag? {
+	fun firstDeep(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
 		for (c in this.children) {
 			if (c.match(attr, *vs)) {
 				return c
@@ -104,10 +101,10 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 	}
 
 	fun single(tagname: String): Tag {
-		return this.first(tagname_ to tagname) ?: this.tag(tagname)
+		return this.first(TAGNAME_ to tagname) ?: this.tag(tagname)
 	}
 
-	fun singleX(tagname: String, vararg vs: HKeyValue): Tag {
+	fun singleX(tagname: String, vararg vs: KeyValuePair): Tag {
 		for (c in this.children) {
 			if (c.tagName == tagname && c.match(*vs)) {
 				return c
@@ -116,11 +113,11 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return this.tag(tagname, *vs)
 	}
 
-	private fun match(vararg vs: HKeyValue): Boolean {
+	private fun match(vararg vs: KeyValuePair): Boolean {
 		for (a in vs) {
 			val c = when {
-				a.first == tagname_.value -> this.tagName == a.second
-				a.first == class_.value -> this.hasClass(a.second)
+				a.first == TAGNAME_ -> this.tagName == a.second
+				a.first == "class" -> this.hasClass(a.second)
 				else -> this[a.first] == a.second
 			}
 			if (!c) {
@@ -130,12 +127,9 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return true
 	}
 
-	fun hasClass(c: HClass): Boolean {
-		return hasClass(c.value)
-	}
 
 	fun hasClass(c: String): Boolean {
-		val v = this[class_]
+		val v = this["class"]
 		if (v == c) {
 			return true
 		}
@@ -148,25 +142,25 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 
 
 	fun idName(idname: String) {
-		this[id_] = idname
-		this[name_] = idname
+		this["id"] = idname
+		this["name"] = idname
 	}
 
 	fun needFor(controlTag: Tag?) {
-		if (controlTag != null && this[for_].isEmpty()) {
-			this[for_] = controlTag.needId()
+		if (controlTag != null && this["for"].isEmpty()) {
+			this["for"] = controlTag.needId()
 		}
 	}
 
 	fun needId(): String {
-		if (this[id_].isEmpty()) {
-			this[id_] = generateElementId(tagName)
+		if (this["id"].isEmpty()) {
+			this["id"] = generateElementId(tagName)
 		}
-		return this[id_]
+		return this["id"]
 	}
 
 	fun addClassFirst(cls: String) {
-		this[class_] = cls..this[class_]
+		this["class"] = cls..this["class"]
 	}
 
 
@@ -181,19 +175,13 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return attrs[key] ?: ""
 	}
 
-	operator fun get(attr: HAttr): String {
-		return attrs[attr.value] ?: ""
-	}
 
 	operator fun set(key: String, value: String) {
 		attrs[key] = value
 	}
 
-	operator fun set(attr: HAttr, value: String) {
-		attrs[attr.value] = value
-	}
 
-	operator fun get(attr: HKeyValue, vararg vs: HKeyValue): List<Tag> {
+	operator fun get(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
 		return this.list(attr, *vs)
 	}
 
@@ -207,7 +195,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		this.children += tag
 	}
 
-	fun tag(tagname: String, vararg kv: HKeyValue): Tag {
+	fun tag(tagname: String, vararg kv: KeyValuePair): Tag {
 		val t = Tag(this, tagname)
 		for (p in kv) {
 			if (p.first == "class") {
@@ -220,7 +208,7 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 		return t
 	}
 
-	fun tag(tagname: String, vararg kv: HKeyValue, block: TagCallback? = null): Tag {
+	fun tag(tagname: String, vararg kv: KeyValuePair, block: TagCallback? = null): Tag {
 		val t = this.tag(tagname, *kv)
 		if (block != null) {
 			t.block()
@@ -271,21 +259,18 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 }
 
 fun Tag.addClass(clazz: String) {
-	this[class_] = this[class_]..clazz
+	this["class"] = this["class"]..clazz
 }
 
-fun Tag.addClass(clazz: HClass) {
-	this[class_] = this[class_]..clazz
-}
 
-fun Tag.removeClass(clazz: HClass) {
-	val s = this[class_]
+fun Tag.removeClass(clazz: String) {
+	val s = this["class"]
 	val ls = s.split(' ').map { it.trim() }.toMutableList()
-	ls.remove(clazz.value)
-	this[class_] = ls.joinToString(" ") { it.trim() }
+	ls.remove(clazz)
+	this["class"] = ls.joinToString(" ") { it.trim() }
 }
 
-fun Tag.setKeyValue(kv: HKeyValue) {
+fun Tag.setKeyValue(kv: KeyValuePair) {
 	this[kv.first] = kv.second
 }
 
@@ -297,24 +282,18 @@ fun Tag.removeAttr(key: String) {
 	this.attrs.remove(key)
 }
 
-fun Tag.removeAttr(attr: HAttr) {
-	this.attrs.remove(attr.value)
-}
 
 infix operator fun Tag?.plusAssign(clazz: String) {
 	this?.addClass(clazz)
 }
 
-infix operator fun Tag?.plusAssign(clazz: HClass) {
-	this?.addClass(clazz)
-}
 
-infix operator fun Tag?.plusAssign(kv: HKeyValue) {
+infix operator fun Tag?.plusAssign(kv: KeyValuePair) {
 	this?.setKeyValue(kv)
 }
 
 
-infix operator fun Tag?.minusAssign(clazz: HClass) {
+infix operator fun Tag?.minusAssign(clazz: String) {
 	this?.removeClass(clazz)
 }
 
@@ -351,13 +330,13 @@ infix operator fun Tag?.plusAssign(action: ActionURL) {
 
 fun Tag.setActionUrl(url: String) {
 	if (this.tagName == "form") {
-		this[action_] = url
+		this["action"] = url
 	} else if (this.tagName == "a") {
-		this[href_] = url
+		this["href"] = url
 	} else if (this.tagName == "button") {
-		this[data_url_] = url
-	} else if (this.tagName == "input" && this[type_] == "button") {
-		this[data_url_] = url
+		this[DATA_URL_] = url
+	} else if (this.tagName == "input" && this["type"] == "button") {
+		this[DATA_URL_] = url
 	} else {
 		throw IllegalArgumentException("该tag不支持action属性")
 	}

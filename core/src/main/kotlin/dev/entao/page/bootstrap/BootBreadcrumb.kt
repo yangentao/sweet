@@ -12,12 +12,12 @@ import dev.entao.page.tag.*
 
 // block 返回 active
 fun Tag.breadcrumb(itemCount: Int, itemCallback: (Tag, Int) -> Boolean) {
-	this.nav(aria_label_ to "breadcrumb") {
-		ol(class_ to _breadcrumb) {
+	this.nav("aria-label" to "breadcrumb") {
+		ol("class" to "breadcrumb") {
 			for (i in 0 until itemCount) {
-				li(class_ to _breadcrumb_item) {
+				li("class" to "breadcrumb-item") {
 					if (itemCallback(this, i)) {
-						this += _active
+						this += "active"
 					}
 				}
 			}

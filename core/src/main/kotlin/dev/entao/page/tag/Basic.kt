@@ -4,12 +4,32 @@ import dev.entao.base.isTypeBoolean
 import dev.entao.base.isTypeInt
 import dev.entao.base.isTypeString
 import dev.entao.base.userName
-import java.util.HashMap
 import kotlin.reflect.KProperty
 
+val TAGNAME_ = "tagname"
+
+//用于button,
+val DATA_URL_ = "data-url"
+val DATA_SELECT_VALUE_ = "data-select-value"
+val DATA_PARAM_NAME_ = "data-param-name"
+val DATA_CONFIRM_ = "data-confirm"
+val DATA_FORM_QUERY_ = "data-form-query"
+
+typealias TagCallback = Tag.() -> Unit
+typealias KeyValuePair = Pair<String, String>
+
+infix operator fun String.rangeTo(s: String): String {
+	if (this.isEmpty()) {
+		return s
+	}
+	if (s.isEmpty()) {
+		return this
+	}
+	return "$this $s"
+}
 
 @Suppress("UNCHECKED_CAST")
-class TagMap : HashMap<String, String>(16) {
+class AttrMap : LinkedHashMap<String, String>() {
 
 
 	operator fun <T> setValue(thisRef: Any?, property: KProperty<*>, value: T) {

@@ -3,16 +3,16 @@ package dev.entao.page.bootstrap
 import dev.entao.page.tag.*
 
 
-fun Tag.progress(vararg kv: HKeyValue, block: Tag.() -> Unit): Tag {
-	return this.div(class_ to _progress, *kv) {
+fun Tag.progress(vararg kv: KeyValuePair, block: Tag.() -> Unit): Tag {
+	return this.div("class" to "progress", *kv) {
 		this.block()
 	}
 }
 
 fun Tag.progressBar(block: Tag.() -> Unit): Tag {
-	return this.div(class_ to _progress_bar, role_ to V.progressbar) {
-		this[aria_valuemin_] = "0"
-		this[aria_valuemax_] = "100"
+	return this.div("class" to "progress-bar", "role" to V.progressbar) {
+		this["aria-valuemin"] = "0"
+		this["aria-valuemax"] = "100"
 		this.block()
 	}
 }

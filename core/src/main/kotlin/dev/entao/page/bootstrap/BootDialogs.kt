@@ -6,10 +6,10 @@ import dev.entao.page.tag.*
 
 fun installDialogs(tag: Tag) {
 	tag.apply {
-		div(id_ to "dialogPanel") {
+		div("id" to "dialogPanel") {
 
 		}
-		div(id_ to "confirmDlgPanel") {
+		div("id" to "confirmDlgPanel") {
 			val b = ModalDialog(httpContext)
 			b.modalTitleText("确认")
 			b.modalBody {
@@ -25,7 +25,7 @@ fun installDialogs(tag: Tag) {
 			b.closeText("取消")
 			add(b)
 		}
-		div(id_ to "alertDlgPanel") {
+		div("id" to "alertDlgPanel") {
 			val b = ModalDialog(httpContext)
 			b.modalTitleText("提示")
 			b.modalBody {
@@ -50,23 +50,23 @@ class ModalDialog(context: HttpContext) : Tag(context, "div") {
 
 	init {
 		this += "modal"
-		this[tabindex_] = "-1"
-		this[role_] = "dialog"
-		div(class_ to _modal_dialog.._modal_dialog_centered, role_ to V.document) {
-			div(class_ to _modal_content) {
-				modalHeader = div(class_ to _modal_header) {
-					modalHeaderTitle = h5(class_ to _modal_title) {
+		this["tabindex"] = "-1"
+		this["role"] = "dialog"
+		div("class" to "modal-dialog".."modal-dialog-centered", "role" to V.document) {
+			div("class" to "modal-content") {
+				modalHeader = div("class" to "modal-header") {
+					modalHeaderTitle = h5("class" to "modal-title") {
 					}
-					buttonB(class_ to _close, data_dismiss_ to "modal") {
+					buttonB("class" to "close", "data-dismiss" to "modal") {
 						span {
 							textUnsafe("&times;")
 						}
 					}
 				}
-				modalBody = div(class_ to "modal-body") {
+				modalBody = div("class" to "modal-body") {
 				}
-				modalFooter = div(class_ to "modal-footer") {
-					closeButton = buttonB(class_ to _btn_secondary, data_dismiss_ to "modal") {
+				modalFooter = div("class" to "modal-footer") {
+					closeButton = buttonB("class" to "btn-secondary", "data-dismiss" to "modal") {
 						+"关闭"
 					}
 				}
@@ -117,9 +117,9 @@ fun HttpScope.dialogForm(title: String, bodyBlock: Tag.() -> Unit) {
 	d.modalBody(bodyBlock)
 	d.closeText("取消")
 	d.modalFooter {
-		buttonPrimary(class_ to "m-1") {
+		buttonPrimary("class" to "m-1") {
 			+"提交"
-			this[onclick_] = "dialogSubmitReload(this);"
+			this["onclick"] = "dialogSubmitReload(this);"
 		}
 	}
 	context.sendHtmlTag(d)

@@ -145,14 +145,14 @@ fun Tag.optionNone(label: String = "无"): Tag {
 
 fun Tag.option(value: String, label: String, selState: Boolean): Tag {
 	return if (selState) {
-		option(value_ to value, selected_ to "true ") { +label }
+		option("value" to value, "selected" to "true ") { +label }
 	} else {
-		option(value_ to value) { +label }
+		option("value" to value) { +label }
 	}
 }
 
 fun Tag.option(value: String, label: String): Tag {
-	return option(value_ to value) { +label }
+	return option("value" to value) { +label }
 }
 
 class LinkageOption(val fromId: String, val targetId: String, val action: HttpAction) {
@@ -226,7 +226,7 @@ fun Tag.formGroupSelectTable(p: Prop, w: Where? = null, dontRetrive: Boolean = f
 		val currValue = propValue(p, null) ?: ""
 		select {
 			idName(p.userName)
-			this[data_select_value_] = currValue
+			this[DATA_SELECT_VALUE_] = currValue
 			if (!dontRetrive) {
 				val ls = p.selectOptionsTable(w)
 				for (kv in ls) {
@@ -246,7 +246,7 @@ fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String
 		val currValue = propValue(p, defaultValue) ?: ""
 		select {
 			idName(p.userName)
-			this[data_select_value_] = currValue
+			this[DATA_SELECT_VALUE_] = currValue
 			if (firstLabel != null) {
 				option(firstValue, firstLabel)
 			}
@@ -263,10 +263,10 @@ fun Tag.formGroupSelectStatic(p: Prop, defaultValue: String?, firstLabel: String
 private fun Tag.selectOptionByValue(value: String) {
 	val ls = this.children.filter { it.tagName == "option" }
 	for (op in ls) {
-		if (op[value_] == value) {
-			op += selected_ to "true"
+		if (op["value"] == value) {
+			op += "selected" to "true"
 		} else {
-			op.removeAttr(selected_)
+			op.removeAttr("selected")
 		}
 	}
 }

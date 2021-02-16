@@ -14,11 +14,11 @@ import dev.entao.page.tag.*
 
 fun Tag.cardHeaderActions(title: String, vararg acList: ActionURL) {
 	cardHeader {
-		div(class_ to _d_flex) {
-			span(class_ to _h6.._mr_auto) { +title }
+		div("class" to "d-flex") {
+			span("class" to "h6".."mr-auto") { +title }
 			span {
 				for (ac in acList) {
-					linkButtonX(ac, class_ to _btn_outline_info.._btn_sm.._mr_1)
+					linkButtonX(ac, "class" to "btn-outline-info".."btn-sm".."mr-1")
 				}
 			}
 		}
@@ -33,42 +33,42 @@ fun Tag.cardBodyTitle(titleText: String, block: TagCallback) {
 }
 
 
-fun Tag.card(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return div(class_ to _card, *vs, block = block)
+fun Tag.card(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return div("class" to "card", *vs, block = block)
 }
 
-fun Tag.cardHeader(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return div(class_ to _card_header, *vs, block = block)
+fun Tag.cardHeader(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return div("class" to "card-header", *vs, block = block)
 }
 
-fun Tag.cardHeaderH6(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return h6(class_ to _card_header, *vs, block = block)
+fun Tag.cardHeaderH6(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return h6("class" to "card-header", *vs, block = block)
 }
 
-fun Tag.cardBody(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return div(class_ to _card_body, *vs, block = block)
+fun Tag.cardBody(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return div("class" to "card-body", *vs, block = block)
 }
 
-fun Tag.cardFooter(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return div(class_ to _card_footer, *vs, block = block)
+fun Tag.cardFooter(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return div("class" to "card-footer", *vs, block = block)
 }
 
-fun Tag.cardTitle(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return h5(class_ to _card_title, *vs, block = block)
+fun Tag.cardTitle(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return h5("class" to "card-title", *vs, block = block)
 }
 
-fun Tag.cardSubTitle(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return h6(class_ to _card_title.._text_muted.._mb_2, *vs, block = block)
+fun Tag.cardSubTitle(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return h6("class" to "card-title".."text-muted".."mb-2", *vs, block = block)
 }
 
-fun Tag.cardText(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return p(class_ to _card_text, *vs, block = block)
+fun Tag.cardText(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return p("class" to "card-text", *vs, block = block)
 }
 
-fun Tag.cardImgTop(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return img(class_ to _card_img_top, *vs, block = block)
+fun Tag.cardImgTop(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return img("class" to "card-img-top", *vs, block = block)
 }
 
-fun Tag.cardLink(vararg vs: HKeyValue, block: TagCallback): Tag {
-	return a(class_ to _card_link, href_ to "#", *vs, block = block)
+fun Tag.cardLink(vararg vs: KeyValuePair, block: TagCallback): Tag {
+	return a("class" to "card-link", "href" to "#", *vs, block = block)
 }

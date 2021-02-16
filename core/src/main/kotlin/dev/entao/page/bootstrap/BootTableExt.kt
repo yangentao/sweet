@@ -43,7 +43,7 @@ open class CheckColumn<T : Any>(val prop: Prop1) : ColumnBuilder<T>() {
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		tag.checkbox(value_ to prop.valOf(item as Any)) {
+		tag.checkbox("value" to prop.valOf(item as Any)) {
 		}
 	}
 }
@@ -57,19 +57,19 @@ open class ActionColumn<T : Any>(val prop: Prop1, vararg val actions: HttpAction
 	}
 
 	override fun onTh(tag: Tag) {
-		tag += _text_right.._pr_3
+		tag += "text-right".."pr-3"
 		tag.textEscaped(this.label)
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		tag += _text_right
+		tag += "text-right"
 		val argV = prop.getValue(item as Any)?.toString() ?: ""
 		tag.span {
 			for (ac in actions) {
 				if (ac.hasAnnotation<ActionDanger>()) {
-					linkButtonX(ac + argV, class_ to _btn_outline_danger.._btn_sm.._mr_2)
+					linkButtonX(ac + argV, "class" to "btn-outline-danger".."btn-sm".."mr-2")
 				} else {
-					linkButtonX(ac + argV, class_ to _btn_outline_primary.._btn_sm.._mr_2)
+					linkButtonX(ac + argV, "class" to "btn-outline-primary".."btn-sm".."mr-2")
 				}
 
 			}
@@ -179,8 +179,8 @@ open class IndexColumn<T : Any>(val index: Int, val label: String) : ColumnBuild
 fun <T : Any> Tag.tableHover(tid: String, items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagCallback = {}): Tag {
 	return tableT(items, cbList, sortParam) {
 		this.id = tid
-		this += _table_hover.._table_bordered
-		first(tagname_ to "thead") += _thead_light
+		this += "table-hover".."table-bordered"
+		first(TAGNAME_ to "thead") += "thead-light"
 		this.callback()
 	}
 }
@@ -197,10 +197,10 @@ fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortNam
 			thead {
 				tr {
 					for (cb in cbList) {
-						th(scope_ to "col") {
+						th("scope" to "col") {
 							cb.onTh(this)
 							if (cb.sortName.isNotEmpty()) {
-								a(role_ to "button", href_ to "#", P.dataSortBy to cb.sortName) {
+								a("role" to "button", "href" to "#", P.dataSortBy to cb.sortName) {
 									var sortIcon = "fa-sort"
 									if (sortName == cb.sortName) {
 										sortIcon = if (desc) {
@@ -209,7 +209,7 @@ fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortNam
 											"fa-sort-up"
 										}
 									}
-									i(class_ to "fas $sortIcon ml-1")
+									i("class" to "fas $sortIcon ml-1")
 								}
 							}
 						}
