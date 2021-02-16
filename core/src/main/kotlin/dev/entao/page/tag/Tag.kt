@@ -11,20 +11,47 @@ import java.util.*
 
 
 //TODO 将tag的toString单独拿出来.
-open class Tag(val httpContext: HttpContext, var tagName: String) {
-
+open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
+	var _context: HttpContext? = null
 	val children = ArrayList<Tag>(8)
-	val attrs: AttrMap = AttrMap()
+	val attrMap: AttrMap = AttrMap()
 	var parent: Tag? = null
-	var id: String by attrs
-	var name: String by attrs
-	var onclick: String by attrs
+		set(value) {
+			field = value
+			if (value != null) {
+				_context = value._context
+			}
+		}
+	var id: String by attrMap
+	var name: String by attrMap
+	var onclick: String by attrMap
 
-	constructor(parent: Tag, name: String) : this(parent.httpContext, name) {
+	init {
+		for (p in tagAttrs) {
+			attrMap[p.first] = p.second
+		}
+	}
+
+	constructor(parent: Tag, name: String) : this(name) {
 		this.parent = parent
+		this._context = parent._context
+	}
+
+	constructor(ctx: HttpContext, tagName: String) : this(tagName) {
+		_context = ctx
+
 	}
 
 	val root: Tag get() = this.parent?.root ?: this
+	val httpContext: HttpContext
+		get() {
+			if (this._context != null) {
+				return this._context!!
+			}
+			val c = parent?.httpContext
+			this._context = c
+			return c!!
+		}
 
 	fun parent(block: (Tag) -> Boolean): Tag? {
 		val p = this.parent ?: return null
@@ -171,13 +198,31 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 	}
 
 
-	operator fun get(key: String): String {
-		return attrs[key] ?: ""
+	fun removeAttr(attr: String) {
+		attrMap.remove(attr)
+	}
+
+	fun removeAt(index: Int): Tag {
+		return children.removeAt(index)
 	}
 
 
-	operator fun set(key: String, value: String) {
-		attrs[key] = value
+	operator fun get(index: Int): Tag {
+		return children[index]
+	}
+
+
+	operator fun set(attr: String, value: String?) {
+		if (value == null) {
+			attrMap.remove(attr)
+		} else {
+			attrMap[attr] = value
+		}
+	}
+
+
+	operator fun get(key: String): String {
+		return attrMap[key] ?: ""
 	}
 
 
@@ -186,30 +231,27 @@ open class Tag(val httpContext: HttpContext, var tagName: String) {
 	}
 
 	infix operator fun plusAssign(tag: Tag) {
-		add(tag)
+		append(tag)
 	}
 
-
-	fun add(tag: Tag) {
+	fun append(tag: Tag, block: TagCallback? = null) {
+		children += tag
 		tag.parent = this
-		this.children += tag
+		tag._context = this._context
+		if (block != null) {
+			tag.block()
+		}
 	}
 
-	fun tag(tagname: String, vararg kv: KeyValuePair): Tag {
-		val t = Tag(this, tagname)
-		for (p in kv) {
-			if (p.first == "class") {
-				t += p.second
-			} else {
-				t[p.first] = p.second
-			}
-		}
-		this += t
+	fun append(tagName: String, kvs: Array<out KeyValuePair>, block: TagCallback? = null): Tag {
+		val t = Tag(tagName, *kvs)
+		append(t, block)
 		return t
 	}
 
+
 	fun tag(tagname: String, vararg kv: KeyValuePair, block: TagCallback? = null): Tag {
-		val t = this.tag(tagname, *kv)
+		val t = append(tagname, kv)
 		if (block != null) {
 			t.block()
 		}
@@ -276,10 +318,6 @@ fun Tag.setKeyValue(kv: KeyValuePair) {
 
 fun Tag.setAttr(key: String, value: String) {
 	this[key] = value
-}
-
-fun Tag.removeAttr(key: String) {
-	this.attrs.remove(key)
 }
 
 

@@ -37,7 +37,7 @@ class HtmlPrinter(val tag: Tag) {
 	}
 
 	private fun writeAttrs(tag: Tag, buf: Appendable) {
-		for ((k, v) in tag.attrs) {
+		for ((k, v) in tag.attrMap) {
 			if (v.isEmpty() && !allowEmptyAttr(tag, k)) {
 				continue
 			}

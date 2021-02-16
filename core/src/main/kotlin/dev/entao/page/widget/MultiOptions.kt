@@ -23,8 +23,8 @@ import kotlin.reflect.full.findAnnotation
 
 class OptionTag(context: HttpContext) : Tag(context, "option") {
 
-	var label: String by attrs
-	var value: String by attrs
+	var label: String by attrMap
+	var value: String by attrMap
 }
 
 val KProperty<*>.formOptionsMap: Map<String, String>

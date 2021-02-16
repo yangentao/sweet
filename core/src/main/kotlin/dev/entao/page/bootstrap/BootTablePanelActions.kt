@@ -8,7 +8,7 @@ import kotlin.reflect.KFunction
 
 fun Tag.tableActionPanel(forTableId: String, block: TableActionPanel.() -> Unit) {
 	val b = TableActionPanel(this.httpContext, forTableId)
-	add(b)
+	append(b)
 	b.block()
 	b.children.forEach {
 		if (it.tagName == "button") {

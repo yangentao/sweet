@@ -23,7 +23,7 @@ fun installDialogs(tag: Tag) {
 				}
 			}
 			b.closeText("取消")
-			add(b)
+			append(b)
 		}
 		div("id" to "alertDlgPanel") {
 			val b = ModalDialog(httpContext)
@@ -34,7 +34,7 @@ fun installDialogs(tag: Tag) {
 				}
 			}
 			b.closeText("关闭")
-			add(b)
+			append(b)
 		}
 	}
 }
@@ -95,7 +95,7 @@ class ModalDialog(context: HttpContext) : Tag(context, "div") {
 
 fun Tag.modalDialog(block: ModalDialog.() -> Unit) {
 	val d = ModalDialog(this.httpContext)
-	add(d)
+	append(d)
 	d.block()
 }
 
