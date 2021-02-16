@@ -168,13 +168,13 @@ private fun Tag.processControlCSS() {
 	val t = this.firstDeep { it.tagName in InputTags } ?: return
 	if (t.tagName == "input") {
 		if (t["type"] == "file") {
-			if (!t.hasClass("form-control-file")) {
+			if (!t.classContains("form-control-file")) {
 				t["class"] = "form-control-file"..t["class"]
 			}
 			return
 		}
 		if (t["readonly"] == "true") {
-			if (!t.hasClass("form-control-plaintext")) {
+			if (!t.classContains("form-control-plaintext")) {
 				t["class"] = "form-control-plaintext"..t["class"]
 			}
 			return
@@ -182,7 +182,7 @@ private fun Tag.processControlCSS() {
 	}
 	val tp = t["type"]
 	if (tp != "radio" && tp != "checkbox") {
-		if (!t.hasClass("form-control")) {
+		if (!t.classContains("form-control")) {
 			t["class"] = "form-control"..t["class"]
 		}
 	}
@@ -267,12 +267,12 @@ fun Tag.formCheck(vararg vs: KeyValuePair, block: TagCallback): Tag {
 		val lb = this.first { it.tagName == "label" }
 		val cb = this.children.find { it.tagName == "input" && (it["type"] == "checkbox" || it["type"] == "radio") }
 		if (cb != null) {
-			if (!cb.hasClass("form-check-input")) {
+			if (!cb.classContains("form-check-input")) {
 				cb["class"] = "form-check-input"..cb["class"]
 			}
 		}
 		if (lb != null) {
-			if (!lb.hasClass("form-check-label")) {
+			if (!lb.classContains("form-check-label")) {
 				lb["class"] = "form-check-label"..lb["class"]
 			}
 		}

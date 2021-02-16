@@ -28,7 +28,11 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 
 	init {
 		for (p in tagAttrs) {
-			attrMap[p.first] = p.second
+			if (p.first == "class" && attrMap["class"] != null) {
+				attrMap[p.first] = attrMap[p.first]!!..p.second
+			} else {
+				attrMap[p.first] = p.second
+			}
 		}
 	}
 
@@ -144,7 +148,7 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		for (a in vs) {
 			val c = when {
 				a.first == TAGNAME_ -> this.tagName == a.second
-				a.first == "class" -> this.hasClass(a.second)
+				a.first == "class" -> this.classContains(a.second)
 				else -> this[a.first] == a.second
 			}
 			if (!c) {
@@ -155,7 +159,7 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 	}
 
 
-	fun hasClass(c: String): Boolean {
+	fun classContains(c: String): Boolean {
 		val v = this["class"]
 		if (v == c) {
 			return true
@@ -186,7 +190,7 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		return this["id"]
 	}
 
-	fun addClassFirst(cls: String) {
+	fun classAddFirst(cls: String) {
 		this["class"] = cls..this["class"]
 	}
 
@@ -198,11 +202,11 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 	}
 
 
-	fun removeAttr(attr: String) {
+	fun attrRemove(attr: String) {
 		attrMap.remove(attr)
 	}
 
-	fun removeAt(index: Int): Tag {
+	fun childAt(index: Int): Tag {
 		return children.removeAt(index)
 	}
 

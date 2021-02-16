@@ -266,7 +266,7 @@ private fun Tag.selectOptionByValue(value: String) {
 		if (op["value"] == value) {
 			op += "selected" to "true"
 		} else {
-			op.removeAttr("selected")
+			op.attrRemove("selected")
 		}
 	}
 }
