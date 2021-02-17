@@ -4,10 +4,15 @@ import dev.entao.base.firstParamName
 import dev.entao.base.urlEncoded
 import dev.entao.base.userName
 import kotlin.math.min
+import kotlin.reflect.KParameter
 import kotlin.reflect.full.valueParameters
 
 class ActionURL(val action: HttpAction) {
 	val map = LinkedHashMap<String, String>()
+	private var currentIndex: Int = 0
+	private val params: List<KParameter> by lazy {
+		action.valueParameters
+	}
 
 	fun toURL(context: HttpContext): String {
 		val s = context.filter.actionUri(action)
@@ -22,57 +27,73 @@ class ActionURL(val action: HttpAction) {
 		return context.fullUrlOf(this.toURL(context))
 	}
 
+	fun bindValueAt(index: Int, v: Any?): ActionURL {
+		val argName = action.valueParameters[index].userName
+		map[argName] = v?.toString() ?: ""
+		return this
+	}
+
+
+	infix fun bindValue(v: Any?): ActionURL {
+		return bindValueAt(currentIndex++, v)
+	}
+
+	fun bindValues(vararg vs: Any): ActionURL {
+		for (v in vs) {
+			bindValue(v)
+		}
+		return this
+	}
+
+	fun bindKeyValue(key: String, value: Any?): ActionURL {
+		map[key] = value?.toString() ?: ""
+		return this
+	}
+
+	infix fun bindKeyValue(p: Pair<String, Any>): ActionURL {
+		return bindKeyValue(p.first, p.second)
+	}
+
+	fun bindKeyValues(vararg ps: Pair<String, Any>): ActionURL {
+		for (p in ps) {
+			bindKeyValue(p.first, p.second)
+		}
+		return this
+	}
 }
+
+
+fun testAction(a: Int, b: String) {
+	println(a)
+	println(b)
+}
+
+fun main() {
+	val a = ::testAction.action..123..456 bindKeyValue ("name" to "Yang")
+//	a bind 123 bind "entao"
+//	a.bindKeyValue("name" to "Yang")
+
+	println(a.map)
+}
+
+
+operator fun ActionURL.rangeTo(v: Any): ActionURL {
+	return this.bindValue(v)
+}
+
+operator fun ActionURL.rangeTo(v: Pair<String, Any>): ActionURL {
+	return this.bindKeyValue(v)
+}
+
+val HttpAction.action: ActionURL get() = ActionURL(this)
 
 operator fun HttpAction.unaryPlus(): ActionURL {
 	return ActionURL(this)
 }
 
-operator fun ActionURL.plus(v: String): ActionURL {
-	val argName = action.firstParamName
-	if (argName != null) {
-		map[argName] = v
-	} else {
-		//throw IllegalArgumentException("函数 $action 无参数")
-	}
-	return this
-}
-
-operator fun ActionURL.plus(v: Number): ActionURL {
-	return this + v.toString()
+operator fun HttpAction.rangeTo(v: Any): ActionURL {
+	return ActionURL(this).bindValue(v)
 }
 
 
-operator fun ActionURL.plus(p: Pair<String, Any?>): ActionURL {
-	map[p.first] = p.second?.toString() ?: ""
-	return this
-}
-
-operator fun ActionURL.plus(vs: List<Any?>): ActionURL {
-	val nameList = action.valueParameters.map { it.userName }
-	val minSize: Int = min(vs.size, nameList.size)
-	for (i in 0 until minSize) {
-		map[nameList[i]] = vs[i]?.toString() ?: ""
-	}
-	return this
-}
-
-
-operator fun HttpAction.plus(v: String): ActionURL {
-	return +this + v
-//	return ActionURL(this) + v
-}
-
-operator fun HttpAction.plus(v: Number): ActionURL {
-	return ActionURL(this) + v
-}
-
-
-operator fun HttpAction.plus(p: Pair<String, Any?>): ActionURL {
-	return ActionURL(this) + p
-}
-
-operator fun HttpAction.plus(vs: List<Any?>): ActionURL {
-	return ActionURL(this) + vs
-}
 

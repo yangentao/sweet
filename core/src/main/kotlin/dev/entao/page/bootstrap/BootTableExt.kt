@@ -1,15 +1,18 @@
 package dev.entao.page.bootstrap
 
 import dev.entao.base.*
+import dev.entao.core.HttpAction
+import dev.entao.core.rangeTo
+import dev.entao.core.valOf
+import dev.entao.page.ActionDanger
+import dev.entao.page.P
+import dev.entao.page.SortParam
+import dev.entao.page.displayString
+import dev.entao.page.modules.Upload
+import dev.entao.page.tag.*
 import dev.entao.sql.Index
 import dev.entao.sql.PrimaryKey
 import dev.entao.sql.Unique
-import dev.entao.core.HttpAction
-import dev.entao.core.plus
-import dev.entao.core.valOf
-import dev.entao.page.*
-import dev.entao.page.modules.Upload
-import dev.entao.page.tag.*
 
 
 abstract class ColumnBuilder<T : Any> {
@@ -67,9 +70,9 @@ open class ActionColumn<T : Any>(val prop: Prop1, vararg val actions: HttpAction
 		tag.span {
 			for (ac in actions) {
 				if (ac.hasAnnotation<ActionDanger>()) {
-					linkButtonX(ac + argV, "class" to "btn-outline-danger".."btn-sm".."mr-2")
+					linkButtonX(ac..argV, "class" to "btn-outline-danger".."btn-sm".."mr-2")
 				} else {
-					linkButtonX(ac + argV, "class" to "btn-outline-primary".."btn-sm".."mr-2")
+					linkButtonX(ac..argV, "class" to "btn-outline-primary".."btn-sm".."mr-2")
 				}
 
 			}
@@ -93,7 +96,7 @@ open class ResColumn<T : Any>(val prop: Prop1, val downAction: HttpAction, val l
 			Upload.oneKey(v)?.rawname ?: ""
 		}
 		if (v != null) {
-			tag.a(downAction + v, displayValue.head(textLimit))
+			tag.a(downAction..v, displayValue.head(textLimit))
 		}
 	}
 }
@@ -140,7 +143,7 @@ open class LinkColumn<T : Any>(prop: Prop1, val linkTo: HttpAction, val argProp:
 		} else {
 			argProp.getValue(item as Any)?.toString() ?: ""
 		}
-		tag.a(linkTo + argV, displayValue.head(textLimit))
+		tag.a(linkTo..argV, displayValue.head(textLimit))
 	}
 }
 
@@ -180,7 +183,7 @@ fun <T : Any> Tag.tableHover(tid: String, items: List<T>, cbList: List<ColumnBui
 	return tableT(items, cbList, sortParam) {
 		this.id = tid
 		this classAdd "table-hover".."table-bordered"
-		first(TAGNAME_ to "thead")?.classAdd( "thead-light" )
+		first(TAGNAME_ to "thead")?.classAdd("thead-light")
 		this.callback()
 	}
 }
