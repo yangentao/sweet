@@ -12,8 +12,8 @@ fun Tag.tableActionPanel(forTableId: String, block: TableActionPanel.() -> Unit)
 	b.block()
 	b.children.forEach {
 		if (it.tagName == "button") {
-			it += "m-1"
-			it += "btn-sm"
+			it classAdd "m-1"
+			it classAdd "btn-sm"
 		}
 	}
 }

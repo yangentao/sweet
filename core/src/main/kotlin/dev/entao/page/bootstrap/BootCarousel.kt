@@ -16,7 +16,7 @@ fun Tag.buildCarousel(ident: String, items: List<CarouselItem>): Tag {
 			for (i in items.indices) {
 				val t = li("data-target" to "#$ident", "data-slide-to" to "$i")
 				if (i == 0) {
-					t += "active"
+					t classAdd "active"
 				}
 			}
 		}
@@ -37,7 +37,7 @@ fun Tag.buildCarousel(ident: String, items: List<CarouselItem>): Tag {
 					}
 				}
 				if (i == 0) {
-					t += "active"
+					t classAdd "active"
 				}
 			}
 		}

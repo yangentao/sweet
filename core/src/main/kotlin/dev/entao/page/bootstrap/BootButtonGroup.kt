@@ -7,11 +7,11 @@ import dev.entao.page.tag.*
 //	<button type="button" class="btn btn-secondary">Middle</button>
 //	<button type="button" class="btn btn-secondary">Right</button>
 //</div>
-fun Tag.buttonGroup(vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonGroup(vararg kv: TagAttr, block: TagBlock): Tag {
 	return this.div("role" to "group", "class" to "btn-group", *kv, block = block)
 }
 
-fun Tag.buttonGroup(theme: String, vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonGroup(theme: String, vararg kv: TagAttr, block: TagBlock): Tag {
 	val g = this.div("role" to "group", "class" to "btn-group", *kv, block = block)
 	g[TAGNAME_ to "button"].forEach {
 		it["class"] = "btn"..theme
@@ -35,7 +35,7 @@ fun Tag.buttonGroup(theme: String, vararg kv: KeyValuePair, block: TagCallback):
 //		<button type="button" class="btn btn-secondary">8</button>
 //	</div>
 //</div>
-fun Tag.buttonToolbar(vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonToolbar(vararg kv: TagAttr, block: TagBlock): Tag {
 	return this.div("role" to "toolbar", "class" to "btn-toolbar", *kv, block = block)
 }
 

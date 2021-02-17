@@ -57,12 +57,12 @@ open class ActionColumn<T : Any>(val prop: Prop1, vararg val actions: HttpAction
 	}
 
 	override fun onTh(tag: Tag) {
-		tag += "text-right".."pr-3"
+		tag classAdd "text-right".."pr-3"
 		tag.textEscaped(this.label)
 	}
 
 	override fun onTd(tag: Tag, item: T) {
-		tag += "text-right"
+		tag classAdd "text-right"
 		val argV = prop.getValue(item as Any)?.toString() ?: ""
 		tag.span {
 			for (ac in actions) {
@@ -176,20 +176,20 @@ open class IndexColumn<T : Any>(val index: Int, val label: String) : ColumnBuild
 	}
 }
 
-fun <T : Any> Tag.tableHover(tid: String, items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagCallback = {}): Tag {
+fun <T : Any> Tag.tableHover(tid: String, items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagBlock = {}): Tag {
 	return tableT(items, cbList, sortParam) {
 		this.id = tid
-		this += "table-hover".."table-bordered"
-		first(TAGNAME_ to "thead") += "thead-light"
+		this classAdd "table-hover".."table-bordered"
+		first(TAGNAME_ to "thead")?.classAdd( "thead-light" )
 		this.callback()
 	}
 }
 
-fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagCallback): Tag {
+fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortParam: SortParam, callback: TagBlock): Tag {
 	return tableT(items, cbList, sortParam.sortBy, sortParam.desc, callback)
 }
 
-fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortName: String, desc: Boolean, callback: TagCallback): Tag {
+fun <T : Any> Tag.tableT(items: List<T>, cbList: List<ColumnBuilder<T>>, sortName: String, desc: Boolean, callback: TagBlock): Tag {
 	return tableResponsive {
 		tableNormal {
 			this += P.dataSortBy to sortName

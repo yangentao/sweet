@@ -17,7 +17,7 @@ fun Tag.breadcrumb(itemCount: Int, itemCallback: (Tag, Int) -> Boolean) {
 			for (i in 0 until itemCount) {
 				li("class" to "breadcrumb-item") {
 					if (itemCallback(this, i)) {
-						this += "active"
+						this classAdd "active"
 					}
 				}
 			}

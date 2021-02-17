@@ -12,7 +12,7 @@ import kotlin.reflect.full.findAnnotation
 
 private val InputTags = setOf("input", "select", "textarea")
 
-fun Tag.formQuery(formAction: KFunction<*>, vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.formQuery(formAction: KFunction<*>, vararg kv: TagAttr, block: TagBlock): Tag {
 	return form("method" to "GET", DATA_FORM_QUERY_ to "1", *kv) {
 		this += formAction
 		this.block()
@@ -20,7 +20,7 @@ fun Tag.formQuery(formAction: KFunction<*>, vararg kv: KeyValuePair, block: TagC
 	}
 }
 
-fun Tag.formRow(block: TagCallback) {
+fun Tag.formRow(block: TagBlock) {
 	div("class" to "form-row", block = block)
 }
 
@@ -68,7 +68,7 @@ fun Tag.formGroupEdit(labelText: String, editName: String, editBlock: Tag.() -> 
 	}
 }
 
-fun Tag.formGroupEdit(p: Prop, block: TagCallback = {}): Tag {
+fun Tag.formGroupEdit(p: Prop, block: TagBlock = {}): Tag {
 	return formGroup {
 		val lb = label(p)
 		val ed = edit(p)
@@ -79,7 +79,7 @@ fun Tag.formGroupEdit(p: Prop, block: TagCallback = {}): Tag {
 	}
 }
 
-fun Tag.formGroupTextArea(p: Prop, block: TagCallback = {}): Tag {
+fun Tag.formGroupTextArea(p: Prop, block: TagBlock = {}): Tag {
 	return formGroup {
 		val lb = label(p)
 		val ed = textarea(p)
@@ -90,7 +90,7 @@ fun Tag.formGroupTextArea(p: Prop, block: TagCallback = {}): Tag {
 	}
 }
 
-fun Tag.formGroup(block: TagCallback): Tag {
+fun Tag.formGroup(block: TagBlock): Tag {
 	return div("class" to "form-group") {
 		this.block()
 		processControlCSS()
@@ -145,7 +145,7 @@ fun Tag.processHelpText(p: Prop) {
 private fun Tag.processGroupEditError(ed: Tag) {
 	val er = httpContext.httpParams.str(Keb.errField(ed["name"])) ?: ""
 	if (er.isNotEmpty()) {
-		ed += "is-invalid"
+		ed classAdd "is-invalid"
 		feedbackInvalid(er)
 	}
 }
@@ -168,13 +168,13 @@ private fun Tag.processControlCSS() {
 	val t = this.firstDeep { it.tagName in InputTags } ?: return
 	if (t.tagName == "input") {
 		if (t["type"] == "file") {
-			if (!t.classContains("form-control-file")) {
+			if (!t.classHas("form-control-file")) {
 				t["class"] = "form-control-file"..t["class"]
 			}
 			return
 		}
 		if (t["readonly"] == "true") {
-			if (!t.classContains("form-control-plaintext")) {
+			if (!t.classHas("form-control-plaintext")) {
 				t["class"] = "form-control-plaintext"..t["class"]
 			}
 			return
@@ -182,7 +182,7 @@ private fun Tag.processControlCSS() {
 	}
 	val tp = t["type"]
 	if (tp != "radio" && tp != "checkbox") {
-		if (!t.classContains("form-control")) {
+		if (!t.classHas("form-control")) {
 			t["class"] = "form-control"..t["class"]
 		}
 	}
@@ -261,18 +261,18 @@ private fun Tag.processPropertiesOfEdit(p: Prop) {
 }
 
 
-fun Tag.formCheck(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.formCheck(vararg vs: TagAttr, block: TagBlock): Tag {
 	return div("class" to "form-check", *vs) {
 		this.block()
 		val lb = this.first { it.tagName == "label" }
 		val cb = this.children.find { it.tagName == "input" && (it["type"] == "checkbox" || it["type"] == "radio") }
 		if (cb != null) {
-			if (!cb.classContains("form-check-input")) {
+			if (!cb.classHas("form-check-input")) {
 				cb["class"] = "form-check-input"..cb["class"]
 			}
 		}
 		if (lb != null) {
-			if (!lb.classContains("form-check-label")) {
+			if (!lb.classHas("form-check-label")) {
 				lb["class"] = "form-check-label"..lb["class"]
 			}
 		}
@@ -289,7 +289,7 @@ fun Tag.feedbackInvalid(text: String) {
 }
 
 
-fun Tag.formTextMuted(block: TagCallback): Tag {
+fun Tag.formTextMuted(block: TagBlock): Tag {
 	return tag("small", "class" to "form-text".."text-muted", block = block)
 }
 

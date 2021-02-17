@@ -3,7 +3,7 @@ package dev.entao.page.bootstrap
 import dev.entao.page.tag.*
 
 
-fun Tag.alert(vararg kv: KeyValuePair, block: TagCallback) {
+fun Tag.alert(vararg kv: TagAttr, block: TagBlock) {
 	this.div("class" to "alert".."alert-dismissible", "role" to "alert", *kv) {
 		button("class" to "close", "data-dismiss" to "alert", "aria-label" to "Close") {
 			span("aria-hidden" to "true") { !"&times;" }

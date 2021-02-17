@@ -25,7 +25,7 @@ fun Tag.cardHeaderActions(title: String, vararg acList: ActionURL) {
 	}
 }
 
-fun Tag.cardBodyTitle(titleText: String, block: TagCallback) {
+fun Tag.cardBodyTitle(titleText: String, block: TagBlock) {
 	this.card {
 		cardHeaderH6 { +titleText }
 		cardBody(block = block)
@@ -33,42 +33,42 @@ fun Tag.cardBodyTitle(titleText: String, block: TagCallback) {
 }
 
 
-fun Tag.card(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.card(vararg vs: TagAttr, block: TagBlock): Tag {
 	return div("class" to "card", *vs, block = block)
 }
 
-fun Tag.cardHeader(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardHeader(vararg vs: TagAttr, block: TagBlock): Tag {
 	return div("class" to "card-header", *vs, block = block)
 }
 
-fun Tag.cardHeaderH6(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardHeaderH6(vararg vs: TagAttr, block: TagBlock): Tag {
 	return h6("class" to "card-header", *vs, block = block)
 }
 
-fun Tag.cardBody(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardBody(vararg vs: TagAttr, block: TagBlock): Tag {
 	return div("class" to "card-body", *vs, block = block)
 }
 
-fun Tag.cardFooter(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardFooter(vararg vs: TagAttr, block: TagBlock): Tag {
 	return div("class" to "card-footer", *vs, block = block)
 }
 
-fun Tag.cardTitle(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardTitle(vararg vs: TagAttr, block: TagBlock): Tag {
 	return h5("class" to "card-title", *vs, block = block)
 }
 
-fun Tag.cardSubTitle(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardSubTitle(vararg vs: TagAttr, block: TagBlock): Tag {
 	return h6("class" to "card-title".."text-muted".."mb-2", *vs, block = block)
 }
 
-fun Tag.cardText(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardText(vararg vs: TagAttr, block: TagBlock): Tag {
 	return p("class" to "card-text", *vs, block = block)
 }
 
-fun Tag.cardImgTop(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardImgTop(vararg vs: TagAttr, block: TagBlock): Tag {
 	return img("class" to "card-img-top", *vs, block = block)
 }
 
-fun Tag.cardLink(vararg vs: KeyValuePair, block: TagCallback): Tag {
+fun Tag.cardLink(vararg vs: TagAttr, block: TagBlock): Tag {
 	return a("class" to "card-link", "href" to "#", *vs, block = block)
 }

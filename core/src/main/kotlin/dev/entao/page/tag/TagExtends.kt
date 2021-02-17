@@ -62,7 +62,7 @@ fun Tag.forField(p: Prop) {
 }
 
 
-fun Tag.mutedText(block: TagCallback): Tag {
+fun Tag.mutedText(block: TagBlock): Tag {
 	return this.small("class" to "text-muted", block = block)
 }
 

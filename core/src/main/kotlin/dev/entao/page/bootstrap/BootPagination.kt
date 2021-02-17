@@ -20,7 +20,7 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 				for (i in 0 until pageCount) {
 					li("class" to "page-item") {
 						if (i == currentPage) {
-							this += "active"
+							this classAdd "active"
 						}
 						a("class" to "page-link", "href" to "#", P.dataPage to "$i") {
 							+"${i + 1}"
@@ -65,7 +65,7 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 				for (i in fromP..toP) {
 					li("class" to "page-item") {
 						if (i == currentPage) {
-							this += "active"
+							this classAdd "active"
 						}
 						a("class" to "page-link", "href" to "#", P.dataPage to "$i") {
 							+"${i + 1}"

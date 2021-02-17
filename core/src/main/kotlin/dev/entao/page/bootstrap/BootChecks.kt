@@ -24,7 +24,7 @@ fun Tag.formGroupRadioStatic(p: Prop, defaultValue: String? = null, inlines: Boo
 		ls.forEach { opt ->
 			formCheck {
 				if (inlines) {
-					this += "form-check-inline"
+					this classAdd "form-check-inline"
 				}
 				val r = radio("name" to pname, "value" to opt.key) {
 					if (selVal == null) { //选中第一个
@@ -51,7 +51,7 @@ fun Tag.formGroupCheckStatic(p: Prop, defaultValue: String? = null, inlines: Boo
 		ls.forEach { opt ->
 			formCheck {
 				if (inlines) {
-					this += "form-check-inline"
+					this classAdd "form-check-inline"
 				}
 				val r = checkbox("name" to pname, "value" to opt.key) {
 					if (selVal == null) { //选中第一个

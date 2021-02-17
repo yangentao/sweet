@@ -3,7 +3,7 @@ package dev.entao.page.bootstrap
 import dev.entao.page.tag.*
 
 
-fun Tag.progress(vararg kv: KeyValuePair, block: Tag.() -> Unit): Tag {
+fun Tag.progress(vararg kv: TagAttr, block: Tag.() -> Unit): Tag {
 	return this.div("class" to "progress", *kv) {
 		this.block()
 	}

@@ -27,18 +27,18 @@ fun Tag.navItem(action: ActionURL, label: String = "") {
 				active = active && (httpContext.params.str(k) == v)
 			}
 			if (active) {
-				this += "active"
+				this classAdd "active"
 			}
 		}
 	}
 }
 
 
-fun Tag.navbar(clazz: String, block: TagCallback) {
+fun Tag.navbar(clazz: String, block: TagBlock) {
 	nav("class" to "navbar".."navbar-expand-lg"..clazz, block = block)
 }
 
-fun Tag.navbarBrand(vararg kv: KeyValuePair, block: TagCallback) {
+fun Tag.navbarBrand(vararg kv: TagAttr, block: TagBlock) {
 	a("class" to "navbar-brand", "href" to "#", *kv, block = block)
 }
 
@@ -58,7 +58,7 @@ fun Tag.navbarCollapse(id: String, count: Int, itemCallback: (Tag, Int) -> Boole
 				li("class" to "nav-item") {
 					val aLink = a("class" to "nav-link", "href" to "#")
 					if (itemCallback(aLink, i)) {
-						this += "active"
+						this classAdd "active"
 					}
 				}
 			}

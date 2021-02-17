@@ -2,6 +2,7 @@
 
 package dev.entao.page.tag
 
+import dev.entao.base.Name
 import dev.entao.base.userLabel
 import dev.entao.core.ActionURL
 import dev.entao.core.HttpAction
@@ -11,7 +12,7 @@ import java.util.*
 
 
 //TODO 将tag的toString单独拿出来.
-open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
+open class Tag(val tagName: String, vararg tagAttrs: TagAttr) {
 	var _context: HttpContext? = null
 	val children = ArrayList<Tag>(8)
 	val attrMap: AttrMap = AttrMap()
@@ -24,12 +25,16 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		}
 	var id: String by attrMap
 	var name: String by attrMap
+
+	@Name("class")
+	var clazz: String by attrMap
+
 	var onclick: String by attrMap
 
 	init {
 		for (p in tagAttrs) {
-			if (p.first == "class" && attrMap["class"] != null) {
-				attrMap[p.first] = attrMap[p.first]!!..p.second
+			if (p.first == "class") {
+				clazz = clazz..p.second
 			} else {
 				attrMap[p.first] = p.second
 			}
@@ -57,6 +62,26 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 			return c!!
 		}
 
+	infix fun classAdd(cls: String) {
+		clazz = TagClass(clazz).add(cls).value
+	}
+
+	infix fun classHas(cls: String): Boolean {
+		return TagClass(clazz).has(cls)
+	}
+
+	infix fun classRemove(cls: String) {
+		clazz = TagClass(clazz).remove(cls).value
+	}
+
+	infix fun classAddFirst(cls: String) {
+		clazz = TagClass(clazz).addFirst(cls).value
+	}
+
+	infix fun classBringFirst(cls: String) {
+		clazz = TagClass(clazz).bringFirst(cls).value
+	}
+
 	fun parent(block: (Tag) -> Boolean): Tag? {
 		val p = this.parent ?: return null
 		if (block(p)) {
@@ -65,12 +90,52 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		return p.parent(block)
 	}
 
-	fun parent(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
+	fun parent(attr: TagAttr, vararg vs: TagAttr): Tag? {
 		val p = this.parent ?: return null
 		if (p.match(attr, *vs)) {
 			return p
 		}
 		return p.parent(attr, *vs)
+	}
+
+
+	fun filter(attr: TagAttr, vararg vs: TagAttr): List<Tag> {
+		return this.children.filter {
+			it.match(attr, *vs)
+		}
+	}
+
+	fun filterDeep(attr: TagAttr, vararg vs: TagAttr): List<Tag> {
+		val ls = ArrayList<Tag>()
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				ls += c
+			}
+			ls += c.filterDeep(attr, *vs)
+		}
+		return ls
+	}
+
+	fun first(attr: TagAttr, vararg vs: TagAttr): Tag? {
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				return c
+			}
+		}
+		return null
+	}
+
+	fun firstDeep(attr: TagAttr, vararg vs: TagAttr): Tag? {
+		for (c in this.children) {
+			if (c.match(attr, *vs)) {
+				return c
+			}
+			val t = c.firstDeep(attr, *vs)
+			if (t != null) {
+				return t
+			}
+		}
+		return null
 	}
 
 	fun first(block: (Tag) -> Boolean): Tag? {
@@ -91,51 +156,11 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		return null
 	}
 
-
-	fun list(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
-		return this.children.filter {
-			it.match(attr, *vs)
-		}
-	}
-
-	fun listDeep(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
-		val ls = ArrayList<Tag>()
-		for (c in this.children) {
-			if (c.match(attr, *vs)) {
-				ls += c
-			}
-			ls += c.listDeep(attr, *vs)
-		}
-		return ls
-	}
-
-	fun first(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
-		for (c in this.children) {
-			if (c.match(attr, *vs)) {
-				return c
-			}
-		}
-		return null
-	}
-
-	fun firstDeep(attr: KeyValuePair, vararg vs: KeyValuePair): Tag? {
-		for (c in this.children) {
-			if (c.match(attr, *vs)) {
-				return c
-			}
-			val t = c.firstDeep(attr, *vs)
-			if (t != null) {
-				return t
-			}
-		}
-		return null
-	}
-
 	fun single(tagname: String): Tag {
 		return this.first(TAGNAME_ to tagname) ?: this.tag(tagname)
 	}
 
-	fun singleX(tagname: String, vararg vs: KeyValuePair): Tag {
+	fun singleX(tagname: String, vararg vs: TagAttr): Tag {
 		for (c in this.children) {
 			if (c.tagName == tagname && c.match(*vs)) {
 				return c
@@ -144,11 +169,11 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		return this.tag(tagname, *vs)
 	}
 
-	private fun match(vararg vs: KeyValuePair): Boolean {
+	private fun match(vararg vs: TagAttr): Boolean {
 		for (a in vs) {
 			val c = when {
 				a.first == TAGNAME_ -> this.tagName == a.second
-				a.first == "class" -> this.classContains(a.second)
+				a.first == "class" -> this.classHas(a.second)
 				else -> this[a.first] == a.second
 			}
 			if (!c) {
@@ -156,19 +181,6 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 			}
 		}
 		return true
-	}
-
-
-	fun classContains(c: String): Boolean {
-		val v = this["class"]
-		if (v == c) {
-			return true
-		}
-		return if (' ' in v) {
-			v.startsWith("$c ") || v.endsWith(" $c") || v.contains(" $c ")
-		} else {
-			c == v
-		}
 	}
 
 
@@ -188,10 +200,6 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 			this["id"] = generateElementId(tagName)
 		}
 		return this["id"]
-	}
-
-	fun classAddFirst(cls: String) {
-		this["class"] = cls..this["class"]
 	}
 
 
@@ -230,15 +238,15 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 	}
 
 
-	operator fun get(attr: KeyValuePair, vararg vs: KeyValuePair): List<Tag> {
-		return this.list(attr, *vs)
+	operator fun get(attr: TagAttr, vararg vs: TagAttr): List<Tag> {
+		return this.filter(attr, *vs)
 	}
 
 	infix operator fun plusAssign(tag: Tag) {
 		append(tag)
 	}
 
-	fun append(tag: Tag, block: TagCallback? = null) {
+	fun append(tag: Tag, block: TagBlock? = null) {
 		children += tag
 		tag.parent = this
 		tag._context = this._context
@@ -247,14 +255,14 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 		}
 	}
 
-	fun append(tagName: String, kvs: Array<out KeyValuePair>, block: TagCallback? = null): Tag {
+	fun append(tagName: String, kvs: Array<out TagAttr>, block: TagBlock? = null): Tag {
 		val t = Tag(tagName, *kvs)
 		append(t, block)
 		return t
 	}
 
 
-	fun tag(tagname: String, vararg kv: KeyValuePair, block: TagCallback? = null): Tag {
+	fun tag(tagname: String, vararg kv: TagAttr, block: TagBlock? = null): Tag {
 		val t = append(tagname, kv)
 		if (block != null) {
 			t.block()
@@ -304,19 +312,8 @@ open class Tag(val tagName: String, vararg tagAttrs: KeyValuePair) {
 	}
 }
 
-fun Tag.addClass(clazz: String) {
-	this["class"] = this["class"]..clazz
-}
 
-
-fun Tag.removeClass(clazz: String) {
-	val s = this["class"]
-	val ls = s.split(' ').map { it.trim() }.toMutableList()
-	ls.remove(clazz)
-	this["class"] = ls.joinToString(" ") { it.trim() }
-}
-
-fun Tag.setKeyValue(kv: KeyValuePair) {
+fun Tag.setKeyValue(kv: TagAttr) {
 	this[kv.first] = kv.second
 }
 
@@ -325,18 +322,8 @@ fun Tag.setAttr(key: String, value: String) {
 }
 
 
-infix operator fun Tag?.plusAssign(clazz: String) {
-	this?.addClass(clazz)
-}
-
-
-infix operator fun Tag?.plusAssign(kv: KeyValuePair) {
+infix operator fun Tag?.plusAssign(kv: TagAttr) {
 	this?.setKeyValue(kv)
-}
-
-
-infix operator fun Tag?.minusAssign(clazz: String) {
-	this?.removeClass(clazz)
 }
 
 

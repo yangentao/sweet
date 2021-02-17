@@ -112,7 +112,7 @@ private fun findLableOfKey(tableName: String, keyCol: String, labelCol: String, 
 	return a?.toString() ?: ""
 }
 
-fun Tag.datalist(id: String, block: TagCallback): Tag {
+fun Tag.datalist(id: String, block: TagBlock): Tag {
 	val t = tag("datalist")
 	t.id = id
 	t.block()
@@ -123,7 +123,7 @@ fun Tag.listOption(label: String, value: String): Tag {
 	return option(label, value, false)
 }
 
-fun Tag.select(block: TagCallback): Tag {
+fun Tag.select(block: TagBlock): Tag {
 	val t = tag("select")
 	t.block()
 	t.needId()

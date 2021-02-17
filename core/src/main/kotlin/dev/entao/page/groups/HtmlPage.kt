@@ -15,11 +15,11 @@ open class HtmlPage(final override val context: HttpContext) : HttpScope {
 	val head: Tag get() = html.head
 	val body: Tag get() = html.body
 
-	fun head(block: TagCallback) {
+	fun head(block: TagBlock) {
 		this.head.block()
 	}
 
-	fun body(block: TagCallback) {
+	fun body(block: TagBlock) {
 		this.body.block()
 	}
 

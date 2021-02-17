@@ -38,7 +38,7 @@ fun Tag.a(action: ActionURL, text: String): Tag {
 }
 
 
-fun Tag.linkButton(vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.linkButton(vararg kv: TagAttr, block: TagBlock): Tag {
 	return a("role" to "button", "class" to "btn", *kv, block = block)
 }
 
@@ -52,15 +52,15 @@ fun Tag.submitPrimary(text: String = "提交"): Tag {
 }
 
 
-fun Tag.buttonB(vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonB(vararg kv: TagAttr, block: TagBlock): Tag {
 	return this.button("class" to "btn", *kv, block = block)
 }
 
-fun Tag.buttonTheme(theme: String, vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonTheme(theme: String, vararg kv: TagAttr, block: TagBlock): Tag {
 	return this.button("class" to "btn"..theme, *kv, block = block)
 }
 
-fun Tag.buttonPrimary(vararg kv: KeyValuePair, block: TagCallback): Tag {
+fun Tag.buttonPrimary(vararg kv: TagAttr, block: TagBlock): Tag {
 	return this.buttonTheme("btn-primary", *kv, block = block)
 }
 
@@ -69,25 +69,25 @@ fun Tag.buttonApplyTheme(action: HttpAction, defaultTheme: String): Tag {
 	val m = action.findAnnotation<ActionTheme>()
 	if (m != null) {
 		if (m.value.isNotEmpty()) {
-			this += m.value
+			this classAdd m.value
 		}
 	} else {
 		if (action.findAnnotation<ActionDanger>() != null) {
-			this += "btn-danger"
+			this classAdd "btn-danger"
 		} else if (action.findAnnotation<ActionSafe>() != null) {
-			this += "btn-success"
+			this classAdd "btn-success"
 		} else if (action.findAnnotation<ActionPrimary>() != null) {
-			this += "btn-primary"
+			this classAdd "btn-primary"
 		} else {
 			if (defaultTheme.isNotEmpty()) {
-				this += defaultTheme
+				this classAdd defaultTheme
 			}
 		}
 	}
 	return this
 }
 
-fun Tag.buttonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
+fun Tag.buttonX(action: HttpAction, vararg kv: TagAttr, block: TagBlock = {}): Tag {
 	val t = button("class" to "btn", *kv) {
 		+action.userLabel
 		this += action
@@ -99,7 +99,7 @@ fun Tag.buttonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallback 
 	return t
 }
 
-fun Tag.buttonX(actionURL: ActionURL, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
+fun Tag.buttonX(actionURL: ActionURL, vararg kv: TagAttr, block: TagBlock = {}): Tag {
 	val action = actionURL.action
 	val t = button("class" to "btn", *kv) {
 		+action.userLabel
@@ -113,7 +113,7 @@ fun Tag.buttonX(actionURL: ActionURL, vararg kv: KeyValuePair, block: TagCallbac
 }
 
 
-fun Tag.linkButtonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
+fun Tag.linkButtonX(action: HttpAction, vararg kv: TagAttr, block: TagBlock = {}): Tag {
 	val t = linkButton(*kv) {
 		this += action
 	}
@@ -121,7 +121,7 @@ fun Tag.linkButtonX(action: HttpAction, vararg kv: KeyValuePair, block: TagCallb
 	return t
 }
 
-fun Tag.linkButtonX(actionURL: ActionURL, vararg kv: KeyValuePair, block: TagCallback = {}): Tag {
+fun Tag.linkButtonX(actionURL: ActionURL, vararg kv: TagAttr, block: TagBlock = {}): Tag {
 	val t = linkButton(*kv) {
 		this += actionURL
 	}

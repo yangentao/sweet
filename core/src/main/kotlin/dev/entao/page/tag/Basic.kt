@@ -1,9 +1,7 @@
 package dev.entao.page.tag
 
-import dev.entao.base.isTypeBoolean
-import dev.entao.base.isTypeInt
-import dev.entao.base.isTypeString
-import dev.entao.base.userName
+import dev.entao.base.*
+import java.util.regex.Pattern
 import kotlin.reflect.KProperty
 
 val TAGNAME_ = "tagname"
@@ -15,8 +13,8 @@ val DATA_PARAM_NAME_ = "data-param-name"
 val DATA_CONFIRM_ = "data-confirm"
 val DATA_FORM_QUERY_ = "data-form-query"
 
-typealias TagCallback = Tag.() -> Unit
-typealias KeyValuePair = Pair<String, String>
+typealias TagBlock = Tag.() -> Unit
+typealias TagAttr = Pair<String, String>
 
 infix operator fun String.rangeTo(s: String): String {
 	if (this.isEmpty()) {
@@ -25,7 +23,70 @@ infix operator fun String.rangeTo(s: String): String {
 	if (s.isEmpty()) {
 		return this
 	}
-	return "$this $s"
+	return TagClass(this).add(s).value
+}
+
+fun main() {
+	println(TagClass("1 a bc").remove("a").value)
+	println(TagClass("1 a bc").bringFirst("a").value)
+	println(TagClass("1 a bc").addFirst("ddd").value)
+}
+
+class TagClass(var value: String) {
+	fun add(cls: String): TagClass {
+		if (!has(cls)) {
+			value = "$value $cls"
+		}
+		return this
+	}
+
+	fun remove(cls: String): TagClass {
+		val n = value.indexOf(cls)
+		when {
+			n < 0 -> {
+			}
+			n + cls.length == value.length -> value = ""
+			n == 0 && value[n + cls.length] == ' ' -> {
+				value = value.substring(n + cls.length + 1)
+			}
+			n == value.length - cls.length && value[value.length - cls.length] == ' ' -> {
+				value.substr(0, value.length - cls.length - 1)
+			}
+			value[n - 1] == ' ' && value[n + cls.length] == ' ' -> {
+				value = value.substring(0, n) + value.substring(n + cls.length + 1)
+			}
+			else -> {
+			}
+		}
+		return this
+	}
+
+	fun has(cls: String): Boolean {
+		val n = value.indexOf(cls)
+		return when {
+			n < 0 -> false
+			n + cls.length == value.length -> true
+			n == 0 -> value[n + cls.length] == ' '
+			n == value.length - cls.length -> value[value.length - cls.length] == ' '
+			else -> value[n - 1] == ' ' && value[n + cls.length] == ' '
+		}
+
+
+	}
+
+	fun bringFirst(cls: String): TagClass {
+		return addFirst(cls)
+	}
+
+	fun addFirst(cls: String): TagClass {
+		remove(cls)
+		value = "$cls $value"
+		return this
+	}
+
+	companion object {
+
+	}
 }
 
 @Suppress("UNCHECKED_CAST")

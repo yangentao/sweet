@@ -49,7 +49,7 @@ class ModalDialog(context: HttpContext) : Tag(context, "div") {
 	lateinit var closeButton: Tag
 
 	init {
-		this += "modal"
+		this classAdd "modal"
 		this["tabindex"] = "-1"
 		this["role"] = "dialog"
 		div("class" to "modal-dialog".."modal-dialog-centered", "role" to "document") {
@@ -84,11 +84,11 @@ class ModalDialog(context: HttpContext) : Tag(context, "div") {
 		modalHeaderTitle.textEscaped(titleText)
 	}
 
-	fun modalBody(block: TagCallback) {
+	fun modalBody(block: TagBlock) {
 		modalBody.block()
 	}
 
-	fun modalFooter(block: TagCallback) {
+	fun modalFooter(block: TagBlock) {
 		modalFooter.block()
 	}
 }
