@@ -86,7 +86,7 @@ class Router(val uri: String, val cls: KClass<*>, val function: KFunction<*>, ob
 			} else if (p.type.isClass(HttpContext::class)) {
 				map[p] = context
 			} else {
-				val v = context.httpParams.str(p)
+				val v = context.params.str(p)
 				if (v == null || v.isEmpty()) {
 					if (!p.isOptional) {
 						if (p.type.isMarkedNullable) {

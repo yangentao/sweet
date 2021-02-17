@@ -1,9 +1,9 @@
+@file:Suppress("unused")
+
 package dev.entao.core
 
-import dev.entao.base.firstParamName
 import dev.entao.base.urlEncoded
 import dev.entao.base.userName
-import kotlin.math.min
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.valueParameters
 

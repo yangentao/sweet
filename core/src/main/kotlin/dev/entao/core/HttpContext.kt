@@ -12,23 +12,23 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
 import javax.servlet.http.Part
+import kotlin.reflect.KProperty
 
 /**
  * Created by entaoyang@163.com on 2016/12/18.
  */
 
 class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val response: HttpServletResponse, val chain: FilterChain) {
-
+	val params: HttpParams by lazy {
+		HttpParams(this)
+	}
 	val fileSender: FileSender by lazy {
 		FileSender(this)
 	}
 	val resultSender: ResultRender by lazy {
 		ResultRender(this)
 	}
-	val httpParams: HttpParams by lazy {
-		HttpParams(this)
-	}
-	val params: HttpParams get() = this.httpParams
+
 	val currentUri: String by lazy { request.requestURI.trimEnd('/').toLowerCase() }
 
 	val propMap = AnyMap()
@@ -41,6 +41,14 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		get() {
 			return buildPath(filter.contextPath)
 		}
+
+	operator fun get(property: KProperty<*>): String {
+		return params[property]
+	}
+
+	operator fun get(key: String): String {
+		return params[key]
+	}
 
 	fun fullUrlOf(uri: String): String {
 		return request.scheme + "://" + request.getHeader("host") + uri

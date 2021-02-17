@@ -78,8 +78,8 @@ class Upload : Model() {
 			m.accountId = context.account
 			m.userId = context.tokenUserId?.toString() ?: ""
 			m.uploadTime = TimeMill.asTimestamp
-			m.platform = context.httpParams.str(PLATFORM) ?: context.httpParams.str("os") ?: ""
-			m.subdir = checkSubDirParam(context.httpParams.str(SUBDIR)?.trim()
+			m.platform = context.params.str(PLATFORM) ?: context.params.str("os") ?: ""
+			m.subdir = checkSubDirParam(context.params.str(SUBDIR)?.trim()
 					?: "")
 			if (m.subdir.isNotEmpty()) {
 				val subF = File(context.uploadDir, m.subdir)

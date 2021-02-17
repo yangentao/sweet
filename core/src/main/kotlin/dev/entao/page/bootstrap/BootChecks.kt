@@ -7,9 +7,9 @@ import dev.entao.page.widget.formOptionsMap
 
 fun Tag.propValue(p: Prop, defaultValue: String? = null): String? {
 	return if (p is Prop0) {
-		p.getValue()?.toString() ?: httpContext.httpParams.str(p.userName) ?: defaultValue
+		p.getValue()?.toString() ?: httpContext.params.str(p.userName) ?: defaultValue
 	} else {
-		httpContext.httpParams.str(p.userName) ?: defaultValue
+		httpContext.params.str(p.userName) ?: defaultValue
 	}
 }
 

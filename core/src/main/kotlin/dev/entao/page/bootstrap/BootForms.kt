@@ -116,10 +116,10 @@ fun Tag.textarea(p: Prop): Tag {
 
 private fun Tag.valueByProp(p: Prop): String {
 	if (p !is Prop0) {
-		return httpContext.httpParams.str(p.userName) ?: ""
+		return httpContext.params.str(p.userName) ?: ""
 	}
 
-	val vv = p.getValue() ?: return httpContext.httpParams.str(p.userName) ?: ""
+	val vv = p.getValue() ?: return httpContext.params.str(p.userName) ?: ""
 
 	if (vv is Double) {
 		val kd = p.findAnnotation<NumberFormat>()
@@ -143,7 +143,7 @@ fun Tag.processHelpText(p: Prop) {
 }
 
 private fun Tag.processGroupEditError(ed: Tag) {
-	val er = httpContext.httpParams.str(Keb.errField(ed["name"])) ?: ""
+	val er = httpContext.params.str(Keb.errField(ed["name"])) ?: ""
 	if (er.isNotEmpty()) {
 		ed classAdd "is-invalid"
 		feedbackInvalid(er)

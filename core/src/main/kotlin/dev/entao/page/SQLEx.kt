@@ -23,7 +23,7 @@ fun <T : Model> ModelClass<T>.listPaged(context: HttpContext, w: Where?, sp: Sor
 }
 
 fun TableQuery.limitPage(context: HttpContext) {
-	val n = context.httpParams.int(P.pageArg) ?: 0
+	val n = context.params.int(P.pageArg) ?: 0
 	this.limit(P.pageSize, n * P.pageSize)
 }
 
@@ -38,7 +38,7 @@ fun TableQuery.orderBy(sp: SortParam) {
 }
 
 fun SQLQuery.limitPage(context: HttpContext) {
-	val n = context.httpParams.int(P.pageArg) ?: 0
+	val n = context.params.int(P.pageArg) ?: 0
 	this.limit(P.pageSize, n * P.pageSize)
 }
 
@@ -58,8 +58,8 @@ class SortParam(context: HttpContext, sortByName: String, desc: Boolean = true) 
 	val desc: Boolean
 
 	init {
-		val a = context.httpParams.str(P.sortBy)
-		val d = context.httpParams.str(P.sortDesc) == "1"
+		val a = context.params.str(P.sortBy)
+		val d = context.params.str(P.sortDesc) == "1"
 		if (a != null) {
 			this.sortBy = a
 			this.desc = d
@@ -75,16 +75,16 @@ class SortParam(context: HttpContext, sortByName: String, desc: Boolean = true) 
 
 private fun HttpScope.sqlParam(p: Prop1): Any? {
 	if (p.isTypeInt) {
-		return context.httpParams.int(p)
+		return context.params.int(p)
 	}
 	if (p.isTypeLong) {
-		return context.httpParams.long(p)
+		return context.params.long(p)
 	}
 	if (p.isTypeFloat || p.isTypeDouble) {
-		return context.httpParams.double(p)
+		return context.params.double(p)
 	}
 	if (p.isTypeString) {
-		val s = context.httpParams.str(p) ?: return null
+		val s = context.params.str(p) ?: return null
 		if (s.isNotEmpty()) {
 			return s
 		}

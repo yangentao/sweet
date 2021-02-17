@@ -8,7 +8,7 @@ import dev.entao.base.isTypeString
 
 interface HttpScope {
 	val context: HttpContext
-	val httpParams: HttpParams get() = context.httpParams
+	val httpParams: HttpParams get() = context.params
 
 	val HttpAction.uri: String
 		get() {
@@ -31,13 +31,13 @@ interface HttpScope {
 
 	fun paramValue(p: Prop1): Any? {
 		if (p.isTypeInt) {
-			return context.httpParams.int(p)
+			return context.params.int(p)
 		}
 		if (p.isTypeLong) {
-			return context.httpParams.long(p)
+			return context.params.long(p)
 		}
 		if (p.isTypeString) {
-			return context.httpParams.str(p)
+			return context.params.str(p)
 		}
 		return null
 	}

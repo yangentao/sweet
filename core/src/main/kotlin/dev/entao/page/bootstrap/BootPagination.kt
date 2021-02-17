@@ -108,7 +108,7 @@ fun Tag.paginationBuild(pageCount: Int, currentPage: Int) {
 
 fun Tag.paginationByRowCount(rowCount: Int) {
 	val pc = (rowCount + P.pageSize - 1) / P.pageSize
-	val n = this.httpContext.httpParams.int(P.pageArg) ?: 0
+	val n = this.httpContext.params.int(P.pageArg) ?: 0
 	this.paginationBuild(pc, n)
 	this.span {
 		+"共 $rowCount 条记录"

@@ -25,11 +25,11 @@ class LinkItem(val label: String, val url: String, var active: Boolean = false) 
 }
 
 fun Tag.showMessagesIfPresent() {
-	val s = this.httpContext.httpParams.str(Keb.ERROR) ?: ""
+	val s = this.httpContext.params.str(Keb.ERROR) ?: ""
 	if (s.isNotEmpty()) {
 		this.alertError(s)
 	}
-	val ss = this.httpContext.httpParams.str(Keb.SUCCESS) ?: ""
+	val ss = this.httpContext.params.str(Keb.SUCCESS) ?: ""
 	if (ss.isNotEmpty()) {
 		this.alertSuccess(ss)
 	}
