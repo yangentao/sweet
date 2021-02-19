@@ -328,7 +328,7 @@ infix operator fun Tag?.plusAssign(kv: TagAttr) {
 
 
 fun Tag.setHttpAction(action: HttpAction) {
-	val url = this.httpContext.filter.actionUri(action)
+	val url = this.httpContext.filter.uriAction(action)
 	this.setActionUrl(url)
 	this.confirm(action)
 	if (this.tagName == "button" || this.tagName == "a") {

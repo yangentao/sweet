@@ -15,7 +15,7 @@ class ActionURL(val action: HttpAction) {
 	}
 
 	fun toURL(context: HttpContext): String {
-		val s = context.filter.actionUri(action)
+		val s = context.filter.uriAction(action)
 		if (map.isEmpty()) {
 			return s
 		}

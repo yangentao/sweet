@@ -4,13 +4,12 @@ package dev.entao.core
 
 import dev.entao.base.MIN
 import dev.entao.base.MyDate
+import dev.entao.base.base64Encoded
+import dev.entao.core.account.isAccountLogined
 import dev.entao.log.Yog
-import dev.entao.log.fatal
-import dev.entao.log.logd
 import dev.entao.log.loge
 import java.util.*
-import javax.servlet.FilterConfig
-import kotlin.reflect.KClass
+import kotlin.reflect.full.hasAnnotation
 
 
 interface HttpTimer {
@@ -31,7 +30,7 @@ object MethodAcceptor : HttpSlice {
 		return router.methods.isNotEmpty()
 	}
 
-	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
+	override fun allowRouter(context: HttpContext, router: Router): Boolean {
 		if (context.request.method.toUpperCase() !in router.methods) {
 			context.abort(400, "Method Error")
 			return false
@@ -59,7 +58,7 @@ class TimerSlice(callback: HttpTimer) : HttpSlice {
 		}
 	}
 
-	override fun onInit(filter: HttpFilter, config: FilterConfig) {
+	override fun onInit(filter: HttpFilter) {
 		this.filter = filter
 		timer?.cancel()
 		timer = null
@@ -125,39 +124,42 @@ class TimerSlice(callback: HttpTimer) : HttpSlice {
 
 }
 
-class HttpActionManager(val filter: HttpFilter) {
-	val allGroups = ArrayList<KClass<out HttpGroup>>()
-	val routeMap = HashMap<String, Router>(32)
 
-	fun onDestory() {
-		routeMap.clear()
-		allGroups.clear()
+
+object LoginCheckSlice : HttpSlice {
+	lateinit var filter: HttpFilter
+	val loginUri: String by lazy {
+		filter.findRouter { it.function.hasAnnotation<LoginAction>() }?.uri?.toLowerCase() ?: ""
 	}
 
-
-	fun find(context: HttpContext): Router? {
-		return routeMap[context.currentUri]
+	override fun onInit(filter: HttpFilter) {
+		super.onInit(filter)
+		this.filter = filter
 	}
 
-	fun addGroup(vararg clses: KClass<out HttpGroup>) {
-		allGroups.addAll(clses)
-		clses.forEach { cls ->
-			for (f in cls.actionList) {
-				val uri = filter.actionUri(f)
-				val info = Router(uri, cls, f)
-				addRouter(info)
+	override fun match(context: HttpContext, router: Router): Boolean {
+		return router.needLogin
+	}
+
+	override fun allowRouter(context: HttpContext, router: Router): Boolean {
+		if (!context.isAccountLogined) {
+			if (loginUri.isNotEmpty()) {
+				if (context.acceptHtml) {
+					var url = context.request.requestURI
+					val qs = context.request.queryString ?: ""
+					if (qs.isNotEmpty()) {
+						url = "$url?$qs"
+					}
+					url = url.base64Encoded
+					val u = Url(loginUri)
+					u.replace(Keb.BACK_URL, url)
+					context.redirect(u.build())
+					return false
+				}
 			}
+			context.abort(401)
+			return false
 		}
+		return true
 	}
-
-	fun addRouter(router: Router) {
-		val u = router.uri.toLowerCase()
-		if (routeMap.containsKey(u)) {
-			val old = routeMap[u]
-			fatal("已经存在对应的Route: ${old?.function} ", u, old.toString())
-		}
-		routeMap[u] = router
-		logd("Add Router: ", u)
-	}
-
 }

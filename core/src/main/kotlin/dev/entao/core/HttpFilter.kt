@@ -3,12 +3,8 @@
 package dev.entao.core
 
 import dev.entao.base.ownerClass
-import dev.entao.log.Yog
-import dev.entao.log.YogDir
-import dev.entao.log.YogPrinter
-import dev.entao.log.logd
-import dev.entao.core.account.LoginCheckSlice
-import dev.entao.core.account.TokenSlice
+import dev.entao.log.*
+import java.io.File
 import java.util.*
 import javax.servlet.*
 import javax.servlet.annotation.WebFilter
@@ -27,19 +23,15 @@ import kotlin.reflect.full.hasAnnotation
 
 typealias HttpAction = KFunction<*>
 
-
 //    @WebFilter中的urlPatterns =  "/*"
 abstract class HttpFilter : Filter {
 
 	open var sessionTimeoutSeconds: Int = 3600
-
-	open var loginUri: String = ""
-	open var logoutUri: String = ""
-	open var accountInfoUri: String = ""
-
 	open var appName: String = "主页"
 
-	private lateinit var filterConfig: FilterConfig
+	lateinit var filterConfig: FilterConfig
+		private set
+
 	var contextPath: String = ""
 		private set
 
@@ -47,7 +39,7 @@ abstract class HttpFilter : Filter {
 	var patternPath: String = ""
 		private set
 
-	val webDir = WebDir()
+	val webDir: WebDir by lazy { WebDir(this) }
 
 	val routeManager: HttpActionManager by lazy {
 		HttpActionManager(this)
@@ -56,23 +48,16 @@ abstract class HttpFilter : Filter {
 
 	val infoMap = HashMap<String, Any>()
 
-	fun addSlice(hs: HttpSlice) {
-		sliceList += hs
-	}
 
 	abstract fun onInit()
 
 	abstract fun cleanThreadLocals()
 
-	abstract fun createTokenPassword(): String
 
 	open fun createLogPrinter(): YogPrinter {
 		return YogDir(webDir.logDir, 15)
 	}
 
-	open fun onDestroy() {
-
-	}
 
 	final override fun init(filterConfig: FilterConfig) {
 		this.filterConfig = filterConfig
@@ -81,33 +66,24 @@ abstract class HttpFilter : Filter {
 		val pat = this::class.findAnnotation<WebFilter>()?.urlPatterns?.toList()?.firstOrNull()
 			?: throw IllegalArgumentException("urlPatterns只能设置一条, 比如: /* 或 /person/*")
 		patternPath = pat.filter { it.isLetterOrDigit() || it == '_' }
-
-		webDir.onConfig(this, filterConfig)
 		Yog.setPrinter(createLogPrinter())
-		logd("Server Start!")
-
 
 		try {
-			addRouterOfThis()
+			addMyRouter()
 			onInit()
 			for (hs in sliceList) {
-				hs.onInit(this, filterConfig)
+				hs.onInit(this)
 			}
 
-			if (this.loginUri.isEmpty()) {
-				this.loginUri = findRouter { it.function.hasAnnotation<LoginAction>() }?.uri?.toLowerCase() ?: ""
-			}
-			if (this.logoutUri.isEmpty()) {
-				this.logoutUri = findRouter { it.function.hasAnnotation<LogoutAction>() }?.uri?.toLowerCase() ?: ""
-			}
-			if (this.accountInfoUri.isEmpty()) {
-				this.accountInfoUri = findRouter { it.function.hasAnnotation<AccountInfoAction>() }?.uri?.toLowerCase() ?: ""
-			}
 		} catch (ex: Exception) {
 			ex.printStackTrace()
 		} finally {
 			cleanThreadLocals()
 		}
+	}
+
+	fun addSlice(hs: HttpSlice) {
+		sliceList += hs
 	}
 
 	fun findRouter(block: (Router) -> Boolean): Router? {
@@ -129,11 +105,15 @@ abstract class HttpFilter : Filter {
 		cleanThreadLocals()
 	}
 
-	fun resUri(res: String): String {
+	open fun onDestroy() {
+
+	}
+
+	fun uriRes(res: String): String {
 		return buildPath(contextPath, res)
 	}
 
-	fun actionUri(ac: KFunction<*>): String {
+	fun uriAction(ac: KFunction<*>): String {
 		val cls = ac.ownerClass!!
 		if (cls == this::class) {
 			return buildPath(contextPath, patternPath, ac.actionName)
@@ -141,14 +121,14 @@ abstract class HttpFilter : Filter {
 		return buildPath(contextPath, patternPath, cls.pageName, ac.actionName)
 	}
 
-	fun groupUri(g: KClass<*>): String {
+	fun uriGroup(g: KClass<*>): String {
 		return buildPath(contextPath, patternPath, g.pageName)
 	}
 
-	private fun addRouterOfThis() {
+	private fun addMyRouter() {
 		val ls = this::class.actionList
 		for (f in ls) {
-			val uri = actionUri(f)
+			val uri = uriAction(f)
 			val info = Router(uri, this::class, f, this)
 			routeManager.addRouter(info)
 		}
@@ -167,12 +147,12 @@ abstract class HttpFilter : Filter {
 				val c = HttpContext(this, request, response, chain)
 				val r = routeManager.find(c)
 				if (r == null) {
-					chain.doFilter(request, response)
+					onNextChain(request, response, chain)
 				} else {
 					doHttpService(c, r)
 				}
 			} else {
-				chain.doFilter(request, response)
+				onNextChain(request, response, chain)
 			}
 		} catch (ex: Exception) {
 			logd(ex)
@@ -182,6 +162,10 @@ abstract class HttpFilter : Filter {
 		}
 	}
 
+	open fun onNextChain(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+		chain.doFilter(request, response)
+	}
+
 	fun doHttpService(c: HttpContext, r: Router) {
 		val ls = sliceList.filter { it.match(c, r) }
 		try {
@@ -189,7 +173,7 @@ abstract class HttpFilter : Filter {
 				hs.beforeRequest(c)
 			}
 			for (hs in ls) {
-				if (!hs.acceptRouter(c, r)) {
+				if (!hs.allowRouter(c, r)) {
 					return
 				}
 			}
@@ -202,7 +186,7 @@ abstract class HttpFilter : Filter {
 			}
 		} catch (ex: Exception) {
 			for (a in ls) {
-				if (a.processError(c, ex)) {
+				if (a.processException(c, ex)) {
 					return
 				}
 			}
@@ -211,26 +195,100 @@ abstract class HttpFilter : Filter {
 	}
 
 
-	val navControlerList: List<Pair<String, KClass<*>>> by lazy {
-		val navConList = ArrayList<Pair<String, KClass<*>>>()
-//		for (c in allPages) {
-//			val ni = c.findAnnotation<NavItem>()
-//			if (ni != null) {
-//				val lb = if (ni.group.isNotEmpty()) {
-//					ni.group
-//				} else {
-//					c.userLabel
-//				}
-//				navConList.add(lb to c)
-//			}
-//		}
-		navConList
-	}
-
 	companion object {
 		val pageSuffixs: HashSet<String> = hashSetOf("Group", "Page")
 		const val ACTION = "Action"
 		const val INDEX = "index"
 
+	}
+}
+
+
+interface HttpSlice {
+	fun onInit(filter: HttpFilter) {}
+	fun match(context: HttpContext, router: Router): Boolean {
+		return true
+	}
+
+	fun beforeRequest(context: HttpContext) {}
+
+	fun allowRouter(context: HttpContext, router: Router): Boolean {
+		return true
+	}
+
+	fun afterRouter(context: HttpContext, r: Router) {}
+	fun afterRequest(context: HttpContext) {}
+	fun processException(context: HttpContext, ex: Exception): Boolean {
+		return false
+	}
+
+	fun onDestory() {}
+}
+
+class HttpActionManager(val filter: HttpFilter) {
+	val allGroups = java.util.ArrayList<KClass<out HttpGroup>>()
+	val routeMap = HashMap<String, Router>(32)
+
+	fun onDestory() {
+		routeMap.clear()
+		allGroups.clear()
+	}
+
+
+	fun find(context: HttpContext): Router? {
+		return routeMap[context.currentUri]
+	}
+
+	fun addGroup(vararg clses: KClass<out HttpGroup>) {
+		allGroups.addAll(clses)
+		clses.forEach { cls ->
+			for (f in cls.actionList) {
+				val uri = filter.uriAction(f)
+				val info = Router(uri, cls, f)
+				addRouter(info)
+			}
+		}
+	}
+
+	fun addRouter(router: Router) {
+		val u = router.uri.toLowerCase()
+		if (routeMap.containsKey(u)) {
+			val old = routeMap[u]
+			fatal("已经存在对应的Route: ${old?.function} ", u, old.toString())
+		}
+		routeMap[u] = router
+		logd("Add Router: ", u)
+	}
+
+}
+
+class WebDir(val filter: HttpFilter) {
+	private var contextPath: String = filter.filterConfig.servletContext.contextPath
+
+	//war解压后的目录,  WEB-INF和META-INF所在的目录
+	val appDir: File = File(filter.filterConfig.servletContext.getRealPath("/"))
+	private val webappsDir: File get() = appDir.parentFile
+
+	val baseDir: File by lazy {
+		sureDir("_base")
+	}
+
+	val uploadDir: File by lazy {
+		sureDir("_files")
+	}
+	val tmpDir: File by lazy {
+		sureDir("_tmp")
+	}
+
+	val logDir: File by lazy {
+		sureDir("_log")
+	}
+
+	private fun sureDir(dirName: String): File {
+		return File(webappsDir, contextPath.trim('/') + dirName).apply {
+			if (!exists()) {
+				mkdir()
+			}
+		}
 	}
 }

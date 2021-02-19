@@ -12,7 +12,7 @@ interface HttpScope {
 
 	val HttpAction.uri: String
 		get() {
-			return context.filter.actionUri(this)
+			return context.filter.uriAction(this)
 		}
 
 	fun redirect(action: HttpAction) {

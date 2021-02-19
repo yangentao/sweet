@@ -180,7 +180,7 @@ fun Tag.selectLinkage(opt: LinkageOption) {
 	} else {
 		""
 	}
-	val uri = httpContext.filter.actionUri(opt.action)
+	val uri = httpContext.filter.uriAction(opt.action)
 	val argName = opt.action.firstParamName ?: "id"
 	script {
 		"""

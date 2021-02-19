@@ -55,43 +55,6 @@ val HttpContext.isAccountLogined: Boolean
 	}
 
 
-object LoginCheckSlice : HttpSlice {
-	lateinit var filter: HttpFilter
-	val loginUri: String by lazy {
-		filter.findRouter { it.function.hasAnnotation<LoginAction>() }?.uri?.toLowerCase() ?: ""
-	}
-
-	override fun onInit(filter: HttpFilter, config: FilterConfig) {
-		super.onInit(filter, config)
-		this.filter = filter
-	}
-
-	override fun match(context: HttpContext, router: Router): Boolean {
-		return router.needLogin
-	}
-
-	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (!context.isAccountLogined) {
-			if (loginUri.isNotEmpty()) {
-				if (context.acceptHtml) {
-					var url = context.request.requestURI
-					val qs = context.request.queryString ?: ""
-					if (qs.isNotEmpty()) {
-						url = "$url?$qs"
-					}
-					url = url.base64Encoded
-					val u = Url(loginUri)
-					u.replace(Keb.BACK_URL, url)
-					context.redirect(u.build())
-					return false
-				}
-			}
-			context.abort(401)
-			return false
-		}
-		return true
-	}
-}
 
 val HttpContext.backURL: String?
 	get() {

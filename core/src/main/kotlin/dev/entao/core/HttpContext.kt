@@ -59,11 +59,11 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 	}
 
 	fun resUri(res: String): String {
-		return filter.resUri(res)
+		return filter.uriRes(res)
 	}
 
 	fun actionUri(action: HttpAction): String {
-		return this.filter.actionUri(action)
+		return this.filter.uriAction(action)
 	}
 
 
