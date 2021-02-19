@@ -4,11 +4,11 @@ package dev.entao.json
 
 
 import dev.entao.base.Exclude
-import dev.entao.base.hasAnnotation
 import dev.entao.base.isPublic
 import dev.entao.base.userName
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
 class YsonEncoderConfig {

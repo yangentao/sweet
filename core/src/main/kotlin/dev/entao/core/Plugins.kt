@@ -14,8 +14,15 @@ import kotlin.reflect.KClass
 
 
 interface HttpTimer {
+	//hour [0-23]
 	fun onHour(h: Int) {}
+
+	//m一直自增 , 会大于60
 	fun onMinute(m: Int) {}
+
+	//dayOfMonth [0-31]
+	//hour [0-23]
+	//minute [0-59]
 	fun onHttpTimer(dayOfMonth: Int, hour: Int, minute: Int)
 }
 
@@ -35,12 +42,16 @@ object MethodAcceptor : HttpSlice {
 }
 
 
-class TimerSlice : HttpSlice {
+class TimerSlice(callback: HttpTimer) : HttpSlice {
 
 
 	private var filter: HttpFilter? = null
 	private var timer: Timer? = null
 	private val timerList = ArrayList<HttpTimer>()
+
+	init {
+		timerList += callback
+	}
 
 	fun addTimer(t: HttpTimer) {
 		if (t !in this.timerList) {
@@ -78,7 +89,6 @@ class TimerSlice : HttpSlice {
 			val timers = ArrayList<HttpTimer>(timerList)
 			timers.forEach {
 				try {
-					filter?.onHttpTimer(day, h, minute)
 					it.onHttpTimer(day, h, minute)
 				} catch (ex: Exception) {
 					ex.printStackTrace()
@@ -87,11 +97,6 @@ class TimerSlice : HttpSlice {
 
 			if (h != preHour) {
 				preHour = h
-				try {
-					filter?.onHour(h)
-				} catch (ex: Exception) {
-					loge(ex)
-				}
 				for (ht in timers) {
 					try {
 						ht.onHour(h)
@@ -102,11 +107,6 @@ class TimerSlice : HttpSlice {
 			}
 
 			val n = minN++
-			try {
-				filter?.onMinute(n)
-			} catch (ex: Exception) {
-				loge(ex)
-			}
 			for (mt in timers) {
 				try {
 					mt.onMinute(n)
@@ -125,12 +125,11 @@ class TimerSlice : HttpSlice {
 
 }
 
-class HttpActionManager : HttpSlice {
+class HttpActionManager(val filter: HttpFilter) {
 	val allGroups = ArrayList<KClass<out HttpGroup>>()
 	val routeMap = HashMap<String, Router>(32)
-	lateinit var filter: HttpFilter
 
-	override fun onDestory() {
+	fun onDestory() {
 		routeMap.clear()
 		allGroups.clear()
 	}

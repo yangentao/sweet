@@ -6,6 +6,7 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * Created by entaoyang@163.com on 2017/5/7.

@@ -3,6 +3,8 @@ package dev.entao.core.account
 import dev.entao.base.base64Decoded
 import dev.entao.base.base64Encoded
 import dev.entao.core.*
+import javax.servlet.FilterConfig
+import kotlin.reflect.full.hasAnnotation
 
 //web登录成功后, 设置account和accountName
 
@@ -54,13 +56,23 @@ val HttpContext.isAccountLogined: Boolean
 
 
 object LoginCheckSlice : HttpSlice {
+	lateinit var filter: HttpFilter
+	val loginUri: String by lazy {
+		filter.findRouter { it.function.hasAnnotation<LoginAction>() }?.uri?.toLowerCase() ?: ""
+	}
+
+	override fun onInit(filter: HttpFilter, config: FilterConfig) {
+		super.onInit(filter, config)
+		this.filter = filter
+	}
+
 	override fun match(context: HttpContext, router: Router): Boolean {
 		return router.needLogin
 	}
 
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
 		if (!context.isAccountLogined) {
-			if (context.filter.loginUri.isNotEmpty()) {
+			if (loginUri.isNotEmpty()) {
 				if (context.acceptHtml) {
 					var url = context.request.requestURI
 					val qs = context.request.queryString ?: ""
@@ -68,7 +80,7 @@ object LoginCheckSlice : HttpSlice {
 						url = "$url?$qs"
 					}
 					url = url.base64Encoded
-					val u = Url(context.filter.loginUri)
+					val u = Url(loginUri)
 					u.replace(Keb.BACK_URL, url)
 					context.redirect(u.build())
 					return false

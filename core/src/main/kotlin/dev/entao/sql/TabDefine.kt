@@ -7,6 +7,7 @@ import dev.entao.sql.ext.printX
 import java.sql.Connection
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 
 fun main() {

@@ -1,7 +1,7 @@
 package dev.entao.core
 
-import dev.entao.base.hasAnnotation
 import dev.entao.base.ownerClass
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * 通用注释

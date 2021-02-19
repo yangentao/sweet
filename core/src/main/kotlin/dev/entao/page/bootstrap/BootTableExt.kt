@@ -13,6 +13,7 @@ import dev.entao.page.tag.*
 import dev.entao.sql.Index
 import dev.entao.sql.PrimaryKey
 import dev.entao.sql.Unique
+import kotlin.reflect.full.hasAnnotation
 
 
 abstract class ColumnBuilder<T : Any> {

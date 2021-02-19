@@ -2,7 +2,6 @@
 
 package dev.entao.core
 
-import dev.entao.base.hasAnnotation
 import dev.entao.base.ownerClass
 import dev.entao.log.Yog
 import dev.entao.log.YogDir
@@ -19,6 +18,7 @@ import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * Created by entaoyang@163.com on 2016/12/21.
@@ -49,11 +49,10 @@ abstract class HttpFilter : Filter {
 
 	val webDir = WebDir()
 
-	val routeManager = HttpActionManager()
-	val timerSlice = TimerSlice()
+	val routeManager: HttpActionManager by lazy {
+		HttpActionManager(this)
+	}
 	val sliceList: ArrayList<HttpSlice> = ArrayList()
-
-	val allGroups: ArrayList<KClass<out HttpGroup>> get() = routeManager.allGroups
 
 	val infoMap = HashMap<String, Any>()
 
@@ -86,13 +85,7 @@ abstract class HttpFilter : Filter {
 		webDir.onConfig(this, filterConfig)
 		Yog.setPrinter(createLogPrinter())
 		logd("Server Start!")
-		this.sliceList.clear()
-		routeManager.filter = this
-		addSlice(this.routeManager)
-		addSlice(this.timerSlice)
-		addSlice(MethodAcceptor)
-		addSlice(LoginCheckSlice)
-		addSlice(TokenSlice(createTokenPassword()))
+
 
 		try {
 			addRouterOfThis()
@@ -119,6 +112,10 @@ abstract class HttpFilter : Filter {
 
 	fun findRouter(block: (Router) -> Boolean): Router? {
 		return routeManager.routeMap.values.firstOrNull(block)
+	}
+
+	inline fun <reified T : Annotation> firstRouter(): Router? {
+		return findRouter { it.function.hasAnnotation<T>() }
 	}
 
 	final override fun destroy() {
@@ -213,25 +210,6 @@ abstract class HttpFilter : Filter {
 		}
 	}
 
-
-	fun addTimer(t: HttpTimer) {
-		this.timerSlice.addTimer(t)
-	}
-
-	//dayOfMonth [0-31]
-	//hour [0-23]
-	//minute [0-59]
-	open fun onHttpTimer(dayOfMonth: Int, hour: Int, minute: Int) {
-
-	}
-
-	//hour [0-23]
-	open fun onHour(hour: Int) {
-	}
-
-	//m一直自增 , 会大于60
-	open fun onMinute(m: Int) {
-	}
 
 	val navControlerList: List<Pair<String, KClass<*>>> by lazy {
 		val navConList = ArrayList<Pair<String, KClass<*>>>()

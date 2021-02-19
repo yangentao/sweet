@@ -4,6 +4,7 @@ import dev.entao.base.*
 import dev.entao.log.logd
 import java.sql.Connection
 import kotlin.reflect.KClass
+import kotlin.reflect.full.hasAnnotation
 
 fun Connection.insert(model: Model): Boolean {
 	val kvs = model.modelPropertiesExists.map { it to it.getValue(model) }

@@ -3,6 +3,7 @@ package dev.entao.base
 import java.text.DecimalFormat
 import kotlin.reflect.*
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
@@ -22,11 +23,12 @@ annotation class Exclude
 
 //表或字段(属性)的名字
 //路由时, controller名字或action名字
-@Target(AnnotationTarget.CLASS,
-		AnnotationTarget.PROPERTY,
-		AnnotationTarget.FIELD,
-		AnnotationTarget.FUNCTION,
-		AnnotationTarget.VALUE_PARAMETER
+@Target(
+	AnnotationTarget.CLASS,
+	AnnotationTarget.PROPERTY,
+	AnnotationTarget.FIELD,
+	AnnotationTarget.FUNCTION,
+	AnnotationTarget.VALUE_PARAMETER
 )
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Name(val value: String)
@@ -54,9 +56,10 @@ annotation class FormTime(val value: String = "HH:mm:ss")
 
 
 //字符串长度限制, 也可用于数组或JsonArray
-@Target(AnnotationTarget.PROPERTY,
-		AnnotationTarget.FIELD,
-		AnnotationTarget.VALUE_PARAMETER
+@Target(
+	AnnotationTarget.PROPERTY,
+	AnnotationTarget.FIELD,
+	AnnotationTarget.VALUE_PARAMETER
 )
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Trim
@@ -146,7 +149,7 @@ val KProperty<*>.isHideClient: Boolean
 		return this.hasAnnotation<HideClient>()
 	}
 
-inline fun <reified T : Annotation> KAnnotatedElement.hasAnnotation(): Boolean = null != this.findAnnotation<T>()
+//inline fun <reified T : Annotation> KAnnotatedElement.hasAnnotation(): Boolean = null != this.findAnnotation<T>()
 
 
 //12345.format(",###.##")

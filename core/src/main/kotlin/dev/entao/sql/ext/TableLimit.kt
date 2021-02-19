@@ -5,6 +5,7 @@ import dev.entao.sql.*
 import java.lang.Integer.max
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 //限制表的记录行数, 用户Log表, IP表等需要定时删除的表
 //必须定义Int或Long类型的自增主键, 并使用@PrimaryKey, @AutoInc修饰主键
