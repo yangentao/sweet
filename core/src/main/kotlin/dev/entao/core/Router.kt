@@ -88,12 +88,24 @@ class Router(val uri: String, val cls: KClass<*>, val function: KFunction<*>, ob
 				map[p] = context
 			} else {
 				val v = context.params.str(p)
-				if (v == null || v.isEmpty()) {
+				if (v == null) {
 					if (!p.isOptional) {
 						if (p.type.isMarkedNullable) {
 							map[p] = null
 						} else {
 							err(p, "缺少参数")
+						}
+					}
+				} else if (v.isEmpty()) {
+					if (p.type.isTypeString) {
+						map[p] = ""
+					} else {
+						if (!p.isOptional) {
+							if (p.type.isMarkedNullable) {
+								map[p] = null
+							} else {
+								err(p, "缺少参数")
+							}
 						}
 					}
 				} else {

@@ -11,7 +11,7 @@ fun Tag.navItem(action: HttpAction, label: String = "") {
 }
 
 fun Tag.navItem(action: ActionURL, label: String = "") {
-	val acUri = this.httpContext.actionUri(action.action)
+	val acUri = this.httpContext.uriAction(action.action)
 	li("class" to "nav-item") {
 		a("class" to "nav-link") {
 			if (label.isNotEmpty()) {

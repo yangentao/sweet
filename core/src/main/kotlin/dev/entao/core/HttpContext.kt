@@ -50,19 +50,22 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		return params[key]
 	}
 
-	fun fullUrlOf(uri: String): String {
+	fun fullURL(uri: String): String {
+		if ("://" in uri) {
+			return uri
+		}
 		return request.scheme + "://" + request.getHeader("host") + uri
 	}
 
 	fun fullURL(action: HttpAction): String {
-		return this.fullUrlOf(actionUri(action))
+		return this.fullURL(uriAction(action))
 	}
 
-	fun resUri(res: String): String {
+	fun uriRes(res: String): String {
 		return filter.uriRes(res)
 	}
 
-	fun actionUri(action: HttpAction): String {
+	fun uriAction(action: HttpAction): String {
 		return this.filter.uriAction(action)
 	}
 
@@ -147,7 +150,7 @@ class HttpContext(val filter: HttpFilter, val request: HttpServletRequest, val r
 		return parts().filter { it.submittedFileName != null && it.submittedFileName.isNotEmpty() }
 	}
 
-	val firstFilePart: Part?
+	val filePartFirst: Part?
 		get() {
 			return this.fileParts().firstOrNull()
 		}

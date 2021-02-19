@@ -28,7 +28,7 @@ fun Tag.keywords(ws: List<String>) {
 }
 
 fun Tag.scriptRes(srcRes: String) {
-	this.tag("script", "type" to "text/javascript", "src" to httpContext.resUri(srcRes))
+	this.tag("script", "type" to "text/javascript", "src" to httpContext.uriRes(srcRes))
 }
 
 fun Tag.script(src: String) {
@@ -275,5 +275,5 @@ fun Tag.stylesheet(url: String) {
 }
 
 fun Tag.stylesheetRes(url: String) {
-	link("rel" to "stylesheet", "href" to httpContext.resUri(url))
+	link("rel" to "stylesheet", "href" to httpContext.uriRes(url))
 }

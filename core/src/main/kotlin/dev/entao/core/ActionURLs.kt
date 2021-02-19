@@ -24,7 +24,7 @@ class ActionURL(val action: HttpAction) {
 	}
 
 	fun fullURL(context: HttpContext): String {
-		return context.fullUrlOf(this.toURL(context))
+		return context.fullURL(this.toURL(context))
 	}
 
 	fun bindValueAt(index: Int, v: Any?): ActionURL {

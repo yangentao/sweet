@@ -25,7 +25,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 	//上传一个文件
 	@HttpMethod("POST")
 	fun uploadAction() {
-		val part: Part? = context.firstFilePart
+		val part: Part? = context.filePartFirst
 		if (part == null) {
 			context.abort(400, "没有file part")
 			return
@@ -114,7 +114,7 @@ class ResGroup(context: HttpContext) : HttpGroup(context) {
 				val uploadUri = tag.httpContext.filter.uriAction(ResGroup::uploadAction)
 				val viewUri = tag.httpContext.filter.uriAction(ResGroup::imgAction)
 				val viewParam = ResGroup::imgAction.firstParamName ?: "id"
-				val missImg = tag.httpContext.resUri(R.fileImageDefault)
+				val missImg = tag.httpContext.uriRes(R.fileImageDefault)
 				tag.configUpload(uploadUri, viewUri, viewParam, 30, missImg)
 			}
 		}
