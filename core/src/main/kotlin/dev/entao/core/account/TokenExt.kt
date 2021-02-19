@@ -69,7 +69,7 @@ class TokenModel(val yo: YsonObject = YsonObject()) {
 //0 永不过期
 fun HttpContext.makeToken(userId: Long, userName: String, platform: String, expireTime: Long): String {
 	val ts = this.filter.sliceList.find { it is TokenSlice } as? TokenSlice
-			?: throw IllegalAccessError("没有找到TokenSlice")
+		?: throw IllegalAccessError("没有找到TokenSlice")
 	val m = TokenModel()
 	m.userId = userId
 	m.userName = userName
@@ -97,6 +97,9 @@ val HttpContext.accessToken: String?
 //	addSlice(TokenSlice("99665588"))
 //}
 class TokenSlice(val pwd: String) : HttpSlice {
+	override fun match(context: HttpContext, router: Router): Boolean {
+		return router.needToken
+	}
 
 	override fun beforeRequest(context: HttpContext) {
 		val token = context.accessToken ?: return
@@ -112,15 +115,13 @@ class TokenSlice(val pwd: String) : HttpSlice {
 	}
 
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (router.needToken) {
-			val m = context.tokenModel
-			if (m == null) {
-				context.abort(401, "未登录")
-				return false
-			} else if (m.expired) {
-				context.abort(401, "验证信息过期,请重新登录")
-				return false
-			}
+		val m = context.tokenModel
+		if (m == null) {
+			context.abort(401, "未登录")
+			return false
+		} else if (m.expired) {
+			context.abort(401, "验证信息过期,请重新登录")
+			return false
 		}
 		return true
 	}

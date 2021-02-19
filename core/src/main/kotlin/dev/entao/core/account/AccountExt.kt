@@ -54,27 +54,28 @@ val HttpContext.isAccountLogined: Boolean
 
 
 object LoginCheckSlice : HttpSlice {
+	override fun match(context: HttpContext, router: Router): Boolean {
+		return router.needLogin
+	}
 
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (router.needLogin) {
-			if (!context.isAccountLogined) {
-				if (context.filter.loginUri.isNotEmpty()) {
-					if (context.acceptHtml) {
-						var url = context.request.requestURI
-						val qs = context.request.queryString ?: ""
-						if (qs.isNotEmpty()) {
-							url = "$url?$qs"
-						}
-						url = url.base64Encoded
-						val u = Url(context.filter.loginUri)
-						u.replace(Keb.BACK_URL, url)
-						context.redirect(u.build())
-						return false
+		if (!context.isAccountLogined) {
+			if (context.filter.loginUri.isNotEmpty()) {
+				if (context.acceptHtml) {
+					var url = context.request.requestURI
+					val qs = context.request.queryString ?: ""
+					if (qs.isNotEmpty()) {
+						url = "$url?$qs"
 					}
+					url = url.base64Encoded
+					val u = Url(context.filter.loginUri)
+					u.replace(Keb.BACK_URL, url)
+					context.redirect(u.build())
+					return false
 				}
-				context.abort(401)
-				return false
 			}
+			context.abort(401)
+			return false
 		}
 		return true
 	}

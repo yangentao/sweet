@@ -20,12 +20,14 @@ interface HttpTimer {
 }
 
 object MethodAcceptor : HttpSlice {
+	override fun match(context: HttpContext, router: Router): Boolean {
+		return router.methods.isNotEmpty()
+	}
+
 	override fun acceptRouter(context: HttpContext, router: Router): Boolean {
-		if (router.methods.isNotEmpty()) {
-			if (context.request.method.toUpperCase() !in router.methods) {
-				context.abort(400, "Method Error")
-				return false
-			}
+		if (context.request.method.toUpperCase() !in router.methods) {
+			context.abort(400, "Method Error")
+			return false
 		}
 		return true
 	}

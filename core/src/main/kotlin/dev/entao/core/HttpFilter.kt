@@ -42,6 +42,7 @@ abstract class HttpFilter : Filter {
 	private lateinit var filterConfig: FilterConfig
 	var contextPath: String = ""
 		private set
+
 	// /* => "" , /person/*  => person     @WebFilter中的urlPatterns
 	var patternPath: String = ""
 		private set
@@ -79,7 +80,7 @@ abstract class HttpFilter : Filter {
 		sliceList.clear()
 		contextPath = filterConfig.servletContext.contextPath
 		val pat = this::class.findAnnotation<WebFilter>()?.urlPatterns?.toList()?.firstOrNull()
-				?: throw IllegalArgumentException("urlPatterns只能设置一条, 比如: /* 或 /person/*")
+			?: throw IllegalArgumentException("urlPatterns只能设置一条, 比如: /* 或 /person/*")
 		patternPath = pat.filter { it.isLetterOrDigit() || it == '_' }
 
 		webDir.onConfig(this, filterConfig)
@@ -167,18 +168,11 @@ abstract class HttpFilter : Filter {
 				request.characterEncoding = "UTF-8"
 				response.characterEncoding = "UTF-8"
 				val c = HttpContext(this, request, response, chain)
-
-				for (hs in sliceList) {
-					hs.beforeRequest(c)
-				}
 				val r = routeManager.find(c)
 				if (r == null) {
 					chain.doFilter(request, response)
 				} else {
-					doHttpFilter(c, r)
-				}
-				for (hs in sliceList) {
-					hs.afterRequest(c)
+					doHttpService(c, r)
 				}
 			} else {
 				chain.doFilter(request, response)
@@ -191,17 +185,34 @@ abstract class HttpFilter : Filter {
 		}
 	}
 
-	fun doHttpFilter(c: HttpContext, r: Router) {
-		for (hs in sliceList) {
-			if (!hs.acceptRouter(c, r)) {
-				return
+	fun doHttpService(c: HttpContext, r: Router) {
+		val ls = sliceList.filter { it.match(c, r) }
+		try {
+			for (hs in ls) {
+				hs.beforeRequest(c)
 			}
-		}
-		r.dispatch(c)
-		for (hs in sliceList) {
-			hs.afterRouter(c, r)
+			for (hs in ls) {
+				if (!hs.acceptRouter(c, r)) {
+					return
+				}
+			}
+			r.dispatch(c)
+			for (hs in ls) {
+				hs.afterRouter(c, r)
+			}
+			for (hs in ls) {
+				hs.afterRequest(c)
+			}
+		} catch (ex: Exception) {
+			for (a in ls) {
+				if (a.processError(c, ex)) {
+					return
+				}
+			}
+			throw ex
 		}
 	}
+
 
 	fun addTimer(t: HttpTimer) {
 		this.timerSlice.addTimer(t)
