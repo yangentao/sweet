@@ -11,7 +11,7 @@ sourceCompatibility = 1.8
 
 repositories {
     maven { url 'http://maven.app800.cn/repository/public/' }
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -41,7 +41,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: 'http://maven.app800.cn/repository/public/') {
-                authentication(userName: ARCHIVA_USERNAME, password: ARCHIVA_PASSWORD)
+//                authentication(userName: ARCHIVA_USERNAME, password: ARCHIVA_PASSWORD)
             }
             pom.artifactId = "tcp"
             pom.groupId = project.group

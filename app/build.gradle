@@ -9,7 +9,7 @@ version '1.6.0'
 
 repositories {
     maven { url 'http://maven.app800.cn/repository/public/' }
-    mavenCentral()
+    jcenter()
     google()
 }
 
